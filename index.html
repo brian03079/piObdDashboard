@@ -1,79 +1,84 @@
 <!DOCTYPE html>
 <html>
-  <link rel="stylesheet" href="/home/pi/piObdDashboard/index.css">
-  <head>
-    <title>Socket.IO chat</title>
-    <style>
-      body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+   <link rel="stylesheet" type="text/css" href="index.css">
+   <head>
+      <title>Socket.IO chat</title>
+      <style>
+         body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+         #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
+         #input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
+         #input:focus { outline: none; }
+         #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
+         #messages { list-style-type: none; margin: 0; padding: 0; }
+         #messages > li { padding: 0.5rem 1rem; }
+         #messages > li:nth-child(odd) { background: #efefef; }
+      </style>
+   </head>
+   <body>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+      <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+      <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+      <!-- Latest compiled and minified CSS -->
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+      <!-- Optional theme -->
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css" integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
+      <!-- Latest compiled and minified JavaScript -->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.2/socket.io.js"></script>
 
-      #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
-      #input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
-      #input:focus { outline: none; }
-      #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
-
-      #messages { list-style-type: none; margin: 0; padding: 0; }
-      #messages > li { padding: 0.5rem 1rem; }
-      #messages > li:nth-child(odd) { background: #efefef; }
-    </style>
-  </head>
-  <body>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-         <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
-
- <!-- Latest compiled and minified CSS -->
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
-
-<!-- Optional theme -->
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css" integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
-
-<!-- Latest compiled and minified JavaScript -->
-
-    <div class="navbar"><span>Real-Time Chart with Plotly.js</span></div>
-    
-    
-    
-    
-    
-    
-    <div class="masthead">
-    <!-- That's what I tried. Help me to find the good css style please -->
-    <div class="row">
-     <div class="col-xs-6" style="border:solid;"><p>Logo image will be placed here but look  at this div behavious !!!!!!</p></div>
-    <div class="col-xs-6" style="border:solid"><p>Site title will be placed here</p></div>
-   
-    <!-- -->
-
-    </div>
-
-    <nav>
-      <ul class="nav nav-justified">
-        <li class="active"><a href="#">Home</a></li>
-        <li><a href="#">Projects</a></li>
-        <li><a href="#">Services</a></li>
-        <li><a href="#">Downloads</a></li>
-        <li><a href="#">About</a></li>
-        <li><a href="#">Contact</a></li>
-      </ul>
-    </nav>
-  </div>
-    
-    
-    
-    <div class="container">
-      <h1 id=speedHeader>0</h1><h2>mph</h2>
-    </div>
-    <div class="wrapper">
-        <div id="speedChart"></div>
-        <script>
-
+      <div class="container">
+          <span>Status:</span>
+          <span id="statusField">Disconnected</span>
+      </div>
+      </div>
+      
+      
+      <div class="container">
+         <div class="row">
+            <div class="col-xs-4">
+               <h1 id=speedField>--</h1>
+               <h4>MPH</h4>
+            </div>
+            <div class="col-xs-4">
+               <h1 id=rpmField>--</h1>
+               <h4>RPM</h4>
+            </div>
+         </div>
+         <div class="row">
+            <div class="col-xs-4">
+               <h6 id=throttleField>--</h6>
+               <h6>% Throttle</h6>
+            </div>
+            <div class="col-xs-4">
+               <h6 id=cabinTempField>--</h6>
+               <h6>Cabin Temp</h6>
+            </div>
+         </div>
+      </div>
+      
+      <div class="wrapper">
+         <div id="speedChart"></div>
+         <script>
+            var layout = {
+                autosize: true,
+                height: 300,
+                margin: {
+                  l: 20,
+                  r: 10,
+                  b: 20,
+                  t: 10,
+                  pad: 1
+                },
+                <!-- paper_bgcolor: '#000000', -->
+                 <!-- plot_bgcolor: '#c7c7c7' -->
+            };
+            
             Plotly.react('speedChart',[{
                 y:[0],
                 type:'line'
-            }]);
+            }], layout);
             
             var cntSpeed = 0;
-
+            
             function updateSpeedChart(speed) {
                 Plotly.extendTraces('speedChart',{ y:[[speed]]}, [0]);
                 cntSpeed++;
@@ -85,19 +90,18 @@
                     });
                 }
             }
-        </script>
-    </div>
-    <div class="wrapper">
-        <div id="rpmChart"></div>
-        <script>
-
+         </script>
+      </div>
+      <div class="wrapper">
+         <div id="rpmChart"></div>
+         <script>
             Plotly.react('rpmChart',[{
                 y:[0],
                 type:'line'
-            }]);
+            }], layout);
             
             var cnt = 0;
-
+            
             function updateRpmChart(rpm) {
                 Plotly.extendTraces('rpmChart',{ y:[[rpm]]}, [0]);
                 cnt++;
@@ -109,24 +113,41 @@
                     });
                 }
             }
-        </script>
-    </div>
-
-
-    <ul id="messages"></ul>
-    <form id="form" action="">
-      <input id="input" autocomplete="off" /><button>Send</button>
-    </form>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.2/socket.io.js"></script>
-
-    <script>
-      var socket = io();
-
-      socket.on('data', function(msg) {
-        $("#speedHeader").text(msg)
-        updateSpeedChart(parseFloat(msg));
-        updateRpmChart(parseFloat(msg * Math.random()));
-      });
-    </script>
-  </body>
+         </script>
+      </div>
+      
+      <script>
+          var socket = io();
+          if (socket != null) {
+            $("#statusField").text = "Connected"
+          }
+         
+          socket.on('data', function(msg) {
+            var carData = $.parseJSON(msg);
+            console.log(carData);
+            var speed = carData['speed'];
+            var rpm = carData['rpm'];
+            var throttle;
+            var cabinTemp;
+            
+            $("#speedField").text(speed)
+            $("#rpmField").text(rpm)
+            updateSpeedChart(speed);
+            updateRpmChart(rpm);
+          });
+      </script>
+      
+      <div class="container">
+         <div class="row">
+            <div class="col-xs-4">
+               <h4 id=faultCodesHeader>Fault Codes:</h4>
+            </div>
+         </div>
+         <div class="row">
+            <div class="col-xs-4">
+               <h6 id=faultCodesHeader>N/A</h6>
+            </div>
+         </div>
+      </div>
+   </body>
 </html>

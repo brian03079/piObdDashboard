@@ -6,19 +6,27 @@ import plotly
 import socketio
 import random 
 import time
+import json
+import obd
+import time
+import re
 import plotly.graph_objs as go 
 from collections import deque 
+
+
+
 
 sio = socketio.Client()
 
 sio.connect('http://localhost:3000')
 
 def randomData():
-    return random.randint(0, 60)
+    data = {'speed': random.randint(0, 60), 'rpm': random.randint(0, 60), 'throttle': random.randint(0, 60)}
+    return json.dumps(data)
 
 def logData():
     sio.emit('data', randomData())
-    time.sleep(.15)
+    time.sleep(.2)
 
 
 @sio.on('my message')
@@ -27,9 +35,30 @@ def on_message(data):
 
 @sio.event
 def connect():
-    print("I'm connected!")
+    print("Connected!")
+    connection = obd.OBD() # auto-connects to USB or RF port
+
     while (True):
-        logData()
+        speedCmd = obd.commands.SPEED # select an OBD command (sensor)
+        response = connection.query(speedCmd) # send the command, and parse the response
+        speed = re.findall("\d+\.\d+", response.value.to("mph"))
+        
+        rpmCmd = obd.commands.RPM # select an OBD command (sensor)
+        response = connection.query(speedCmdrpmCmd) # send the command, and parse the response
+        rpm = response.value
+        
+        throttleCmd = obd.commands.THROTTLE_POS # select an OBD command (sensor)
+        response = connection.query(throttleCmd) # send the command, and parse the response
+        throttle = response.value
+
+        data = {'speed': speed, 'rpm': rpm, 'throttle': throttle}
+        sio.emit('data', json.dumps(data))
+        #print(response.value) # returns unit-bearing values thanks to Pint
+        #print(response.value.to("mph"), end="\r", flush=True) # user-friendly unit conversions
+        time.sleep(.2)
+    
+    #while (True):
+    #logData()
 
 @sio.event
 def connect_error():
