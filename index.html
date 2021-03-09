@@ -2,7 +2,7 @@
 <html>
    <link rel="stylesheet" type="text/css" href="index.css">
    <head>
-      <title>Socket.IO chat</title>
+      <title>piObdDashboard</title>
       <style>
          body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
          #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
@@ -27,7 +27,7 @@
 
       <div class="container">
           <span>Status:</span>
-          <span id="statusField">Disconnected</span>
+          <span id="statusField"></span>
       </div>
       </div>
       
@@ -45,12 +45,12 @@
          </div>
          <div class="row">
             <div class="col-xs-4">
-               <h6 id=throttleField>--</h6>
+               <h3 id=throttleField>--</h3>
                <h6>% Throttle</h6>
             </div>
             <div class="col-xs-4">
                <h6 id=cabinTempField>--</h6>
-               <h6>Cabin Temp</h6>
+               <h6>Cabin Temp (F)</h6>
             </div>
          </div>
       </div>
@@ -58,6 +58,7 @@
       <div class="wrapper">
          <div id="speedChart"></div>
          <script>
+           var x_max = 100;
             var layout = {
                 autosize: true,
                 height: 300,
@@ -82,10 +83,10 @@
             function updateSpeedChart(speed) {
                 Plotly.extendTraces('speedChart',{ y:[[speed]]}, [0]);
                 cntSpeed++;
-                if(cntSpeed > 15) {
+                if(cntSpeed > x_max) {
                     Plotly.relayout('speedChart',{
                         xaxis: {
-                            range: [cntSpeed-15,cntSpeed]
+                            range: [cntSpeed-x_max,cntSpeed]
                         }
                     });
                 }
@@ -105,10 +106,10 @@
             function updateRpmChart(rpm) {
                 Plotly.extendTraces('rpmChart',{ y:[[rpm]]}, [0]);
                 cnt++;
-                if(cnt > 15) {
+                if(cnt > x_max) {
                     Plotly.relayout('rpmChart',{
                         xaxis: {
-                            range: [cnt-15,cnt]
+                            range: [cnt-x_max,cnt]
                         }
                     });
                 }
@@ -125,13 +126,14 @@
           socket.on('data', function(msg) {
             var carData = $.parseJSON(msg);
             console.log(carData);
-            var speed = carData['speed'];
-            var rpm = carData['rpm'];
-            var throttle;
+            var speed = parseInt(carData['speed']);
+            var rpm = parseInt(carData['rpm']);
+            var throttle = parseInt(carData['throttle']);
             var cabinTemp;
             
             $("#speedField").text(speed)
             $("#rpmField").text(rpm)
+            $("#throttleField").text(throttle)
             updateSpeedChart(speed);
             updateRpmChart(rpm);
           });
@@ -140,7 +142,7 @@
       <div class="container">
          <div class="row">
             <div class="col-xs-4">
-               <h4 id=faultCodesHeader>Fault Codes:</h4>
+               <h4 id=faultCodesHeader>DTC(s):</h4>
             </div>
          </div>
          <div class="row">
