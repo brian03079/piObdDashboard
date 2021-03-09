@@ -1,6 +1,11 @@
 # piObdDashboard
 WIP raspberry-pi server-client app that pulls and displays data from a car's OBD2 port. Currently is able to display speed, rpm, and throttle %. More functionality and stability will be added as I continue working on it.
 
+Helpful links:
+https://github.com/autopi-io/py-obd
+https://dash.plotly.com/
+https://socket.io/get-started/chat
+
 Required hardware:
 1. OBD usb cable
     -bluetooth ones should work, though I used a usb cable for increased security, reliability, and not having to worry about battery drain
@@ -15,11 +20,12 @@ Required hardware:
 Dependencies:
 1. nodejs
 2. npm
-3. plotly
-4. dash
-5. socketio
+3. plotly (for js and python)
+4. dash (python)
+5. socketio (for js and python)
 6. python3
 7. express@4
+8. python-OBD
 
 How to run:
 1. Make sure your car is on with the engine running
