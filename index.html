@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-   <link rel="stylesheet" type="text/css" href="index.css">
    <head>
       <title>piObdDashboard</title>
       <style>
@@ -15,15 +14,16 @@
       </style>
    </head>
    <body>
-      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-      <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-      <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
-      <!-- Latest compiled and minified CSS -->
-      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
-      <!-- Optional theme -->
-      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css" integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
-      <!-- Latest compiled and minified JavaScript -->
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.2/socket.io.js"></script>
+      <script src="/js/jquery.min.js"></script>
+      <script src="/js/plotly-latest.min.js"></script>
+      <script src="/js/bootstrap.min.js"></script>
+      <link rel="stylesheet" type="text/css" href="/css/index.css">
+      <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+      <link rel="stylesheet" type="text/css" href="/css/bootstrap-theme.min.css">
+      
+      <script src="/js/socket.io.min.js"></script>
+      
+      
       <div class="container">
          <span>Status:</span>
          <span id="statusField"></span>
@@ -31,22 +31,22 @@
       </div>
       <div class="container">
          <div class="row">
-            <div class="col-xs-4">
-               <h1 id=speedField>--</h1>
+            <div class="col-xs-4 left pad-left">
+               <h1 class="mph" id=speedField>--</h1>
                <h4>MPH</h4>
             </div>
-            <div class="col-xs-4">
-               <h1 id=rpmField>--</h1>
+            <div class="col-xs-4 right">
+               <h1 class="rpm" id=rpmField>--</h1>
                <h4>RPM</h4>
             </div>
          </div>
          <div class="row">
-            <div class="col-xs-4">
+            <div class="col-xs-4 left pad-left">
                <h3 id=throttleField>--</h3>
                <h6>% Throttle</h6>
             </div>
-            <div class="col-xs-4">
-               <h6 id=cabinTempField>--</h6>
+            <div class="col-xs-4 right">
+               <h3 id=cabinTempField>--</h3>
                <h6>Cabin Temp (F)</h6>
             </div>
          </div>
@@ -60,12 +60,23 @@
              var speedLayout = {
                  autosize: true,
                  height: 300,
+                 
                  margin: {
                    l: 55,
                    r: 10,
                    b: 25,
                    t: 10,
                    pad: 1
+                 },
+                 xaxis: {
+                    <!--tickformat: "%I:%M" -->
+                    tickangle: 0,
+                    nticks: 6,
+                    gridcolor: '#1F77B4'
+                 },
+                 yaxis: {
+                    <!-- rangemode:'tozero' -->
+                    gridcolor: '#1F77B4'
                  },
                  font: {
                    size: 20,
@@ -78,13 +89,22 @@
              Plotly.react('speedChart',[{
                   x:[startTime],
                  y:[0],
-                 type:'line'
+                 type:'line',
+                 
+                 line: {
+                  width: 1
+               },
+               fill: 'tozeroy'
              }], speedLayout);
              
              var cntSpeed = 0;
              
              function updateSpeedChart(speed, time) {
-                 Plotly.extendTraces('speedChart',{ x:[[time]], y:[[speed]]}, [0], x_max);
+                var speedTrace = {
+                   x:[[time]],
+                   y:[[speed]]
+                }
+                 Plotly.extendTraces('speedChart', speedTrace, [0], x_max);
                  
              }
          </script>
@@ -104,6 +124,15 @@
                    t: 10,
                    pad: 1
                  },
+                 xaxis: {
+                    <!--tickformat: "%I:%M" -->
+                    tickangle: 0,
+                    nticks: 6,
+                    gridcolor: '#00ba00'
+                 },
+                 yaxis: {
+                    gridcolor: '#00ba00'
+                 },
                  font: {
                    size: 20,
                    color: rpmColor
@@ -112,18 +141,30 @@
                   <!-- plot_bgcolor: '#c7c7c7' -->
              };
              
+             
+             
              Plotly.react('rpmChart',[{   
                x:[startTime],
                  y:[0],
                  type:'line',
-                                 line: {color: rpmColor}
+               line: {
+                  color: rpmColor,
+                  width: 1
+               },
+               fill: 'tozeroy'
             
              }], rpmLayout);
              
              var cnt = 0;
              
              function updateRpmChart(rpm, time) {
-                 Plotly.extendTraces('rpmChart',{ x:[[time]], y:[[rpm]]}, [0], x_max);
+               var scaledRpm = (rpm / 1000).toFixed(3);
+                var rpmTrace = {
+                   x:[[time]],
+                   y:[[scaledRpm]]
+                }
+                
+                 Plotly.extendTraces('rpmChart', rpmTrace, [0], x_max);
                  
              }
          </script>
@@ -178,7 +219,7 @@
          
                  //Only add row if fault code doesn't exist in table. 
                  if ($('#' + code).length == 0) {
-                     table.append('<tr id=' + code + '><td><h5>' + code + '</h5></td><td><h5>' + description + '</h5></td></tr>');
+                     table.append('<tr id=' + code + '><td>' + code + '</td><td>' + description + '</td></tr>');
                  } else if ($('#' + code) != null) {
                    
                  }

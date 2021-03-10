@@ -1,0 +1,26 @@
+.left {
+    float: left;
+    margin-right: 100px;
+}
+
+.pad-left {
+    margin-left: 15px;
+}
+
+.right {
+   float: left;
+}
+
+.rpm {
+    font-size: 56px;
+    color: #00ba00;
+}
+
+.mph {
+    font-size: 56px;
+    color: #1F77B4;
+}
+
+th, td {
+    font-size: 14px;
+}

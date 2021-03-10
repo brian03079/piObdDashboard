@@ -34,18 +34,17 @@ def connect():
         response = connection.query(speedCmd) # send the command, and parse the response
         speed = str(response.value.to("mph").magnitude)
         
-        time.sleep(.5)
         rpmCmd = obd.commands.RPM # select an OBD command (sensor)
         response = connection.query(rpmCmd) # send the command, and parse the response
         rpm = response.value.magnitude
         
-        time.sleep(.5)
         throttleCmd = obd.commands.THROTTLE_POS # select an OBD command (sensor)
         response = connection.query(throttleCmd) # send the command, and parse the response
         throttle = str(response.value.magnitude)
 
         data = {'speed': speed, 'rpm': rpm, 'throttle': throttle}
         sio.emit('data', json.dumps(data))
+        time.sleep(.25)
         #print(response.value) # returns unit-bearing values thanks to Pint
         #print(response.value.to("mph"), end="\r", flush=True) # user-friendly unit conversions
     

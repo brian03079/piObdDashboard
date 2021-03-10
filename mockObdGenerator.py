@@ -27,7 +27,7 @@ def generateFaultCodes():
     
 def generateData():
     
-    data = {'speed': random.randint(40, 60),
+    data = {'speed': random.randint(75, 85),
         'rpm': random.randint(1500, 5000),
         'throttle': random.randint(40, 60)}
     return json.dumps(data)
@@ -35,7 +35,7 @@ def generateData():
 def sendData():
     sio.emit('data', generateData())
     sio.emit('faultCodeData', generateFaultCodes())
-    time.sleep(1)
+    time.sleep(.2)
 
 @sio.on('my message')
 def on_message(data):
