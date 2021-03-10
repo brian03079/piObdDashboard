@@ -13,9 +13,6 @@ import re
 import plotly.graph_objs as go 
 from collections import deque 
 
-
-
-
 sio = socketio.Client()
 
 sio.connect('http://localhost:3000')
@@ -45,11 +42,6 @@ def connect():
         data = {'speed': speed, 'rpm': rpm, 'throttle': throttle}
         sio.emit('data', json.dumps(data))
         time.sleep(.25)
-        #print(response.value) # returns unit-bearing values thanks to Pint
-        #print(response.value.to("mph"), end="\r", flush=True) # user-friendly unit conversions
-    
-    #while (True):
-    #logData()
 
 @sio.event
 def connect_error():

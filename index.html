@@ -1,237 +1,213 @@
 <!DOCTYPE html>
 <html>
-   <head>
-      <title>piObdDashboard</title>
-      <style>
-         body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-         #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
-         #input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
-         #input:focus { outline: none; }
-         #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
-         #messages { list-style-type: none; margin: 0; padding: 0; }
-         #messages > li { padding: 0.5rem 1rem; }
-         #messages > li:nth-child(odd) { background: #efefef; }
-      </style>
-   </head>
-   <body>
-      <script src="/js/jquery.min.js"></script>
-      <script src="/js/plotly-latest.min.js"></script>
-      <script src="/js/bootstrap.min.js"></script>
-      <link rel="stylesheet" type="text/css" href="/css/index.css">
-      <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
-      <link rel="stylesheet" type="text/css" href="/css/bootstrap-theme.min.css">
-      
-      <script src="/js/socket.io.min.js"></script>
-      
-      
-      <div class="container">
-         <span>Status:</span>
-         <span id="statusField"></span>
-      </div>
-      </div>
-      <div class="container">
-         <div class="row">
-            <div class="col-xs-4 left pad-left">
-               <h1 class="mph" id=speedField>--</h1>
-               <h4>MPH</h4>
-            </div>
-            <div class="col-xs-4 right">
-               <h1 class="rpm" id=rpmField>--</h1>
-               <h4>RPM</h4>
-            </div>
-         </div>
-         <div class="row">
-            <div class="col-xs-4 left pad-left">
-               <h3 id=throttleField>--</h3>
-               <h6>% Throttle</h6>
-            </div>
-            <div class="col-xs-4 right">
-               <h3 id=cabinTempField>--</h3>
-               <h6>Cabin Temp (F)</h6>
-            </div>
-         </div>
-      </div>
-      <div class="wrapper">
-         <div id="speedChart"></div>
-         <script>
-            var startTime = new Date($.now());
-            var x_max = 500;
-            
-             var speedLayout = {
-                 autosize: true,
-                 height: 300,
-                 
-                 margin: {
-                   l: 55,
-                   r: 10,
-                   b: 25,
-                   t: 10,
-                   pad: 1
-                 },
-                 xaxis: {
-                    <!--tickformat: "%I:%M" -->
-                    tickangle: 0,
-                    nticks: 6,
-                    gridcolor: '#1F77B4'
-                 },
-                 yaxis: {
-                    <!-- rangemode:'tozero' -->
-                    gridcolor: '#1F77B4'
-                 },
-                 font: {
-                   size: 20,
-                   color: '#1F77B4'
-                 }
-                 <!-- paper_bgcolor: '#000000', -->
-                  <!-- plot_bgcolor: '#c7c7c7' -->
-             };
-             
-             Plotly.react('speedChart',[{
-                  x:[startTime],
-                 y:[0],
-                 type:'line',
-                 
-                 line: {
-                  width: 1
-               },
-               fill: 'tozeroy'
-             }], speedLayout);
-             
-             var cntSpeed = 0;
-             
-             function updateSpeedChart(speed, time) {
-                var speedTrace = {
-                   x:[[time]],
-                   y:[[speed]]
-                }
-                 Plotly.extendTraces('speedChart', speedTrace, [0], x_max);
-                 
-             }
-         </script>
-      </div>
-      <div class="wrapper">
-         <div id="rpmChart"></div>
-         <script>
-           var rpmColor = '#00ba00';
+    <head>
+        <title>piObdDashboard</title>
+    </head>
+    <body>
+        <script src="/js/jquery.min.js"></script>
+        <script src="/js/plotly-latest.min.js"></script>
+        <script src="/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="/css/index.css" />
+        <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css" />
+        <link rel="stylesheet" type="text/css" href="/css/bootstrap-theme.min.css" />
 
-            var rpmLayout = {
-                 autosize: true,
-                 height: 300,
-                 margin: {
-                   l: 55,
-                   r: 10,
-                   b: 25,
-                   t: 10,
-                   pad: 1
-                 },
-                 xaxis: {
-                    <!--tickformat: "%I:%M" -->
-                    tickangle: 0,
-                    nticks: 6,
-                    gridcolor: '#00ba00'
-                 },
-                 yaxis: {
-                    gridcolor: '#00ba00'
-                 },
-                 font: {
-                   size: 20,
-                   color: rpmColor
+        <script src="/js/socket.io.min.js"></script>
+
+        <div class="container">
+            <span>Status:</span>
+            <span id="statusField"></span>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-4 left pad-left">
+                    <h1 class="mph" id="speedField">--</h1>
+                    <h4>MPH</h4>
+                </div>
+                <div class="col-xs-4 right">
+                    <h1 class="rpm" id="rpmField">--</h1>
+                    <h4>RPM</h4>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-4 left pad-left">
+                    <h3 id="throttleField">--</h3>
+                    <h6>% Throttle</h6>
+                </div>
+                <div class="col-xs-4 right">
+                    <h3 id="cabinTempField">--</h3>
+                    <h6>Cabin Temp (F)</h6>
+                </div>
+            </div>
+        </div>
+        <div class="wrapper">
+            <div id="speedChart"></div>
+            <script>
+                var startTime = new Date($.now());
+                var x_max = 500;
+
+                 var speedLayout = {
+                     autosize: true,
+                     height: 300,
+
+                     margin: {
+                       l: 55,
+                       r: 10,
+                       b: 25,
+                       t: 10,
+                       pad: 1
+                     },
+                     xaxis: {
+                        <!--tickformat: "%I:%M" -->
+                        tickangle: 0,
+                        nticks: 6,
+                        gridcolor: '#1F77B4'
+                     },
+                     yaxis: {
+                        <!-- rangemode:'tozero' -->
+                        gridcolor: '#1F77B4'
+                     },
+                     font: {
+                       size: 20,
+                       color: '#1F77B4'
+                     }
+                     <!-- paper_bgcolor: '#000000', -->
+                      <!-- plot_bgcolor: '#c7c7c7' -->
+                 };
+
+                 Plotly.react('speedChart',[{
+                      x:[startTime],
+                     y:[0],
+                     type:'line',
+
+                     line: {
+                      width: 1
+                   },
+                   fill: 'tozeroy'
+                 }], speedLayout);
+
+                 var cntSpeed = 0;
+
+                 function updateSpeedChart(speed, time) {
+                    var speedTrace = {
+                       x:[[time]],
+                       y:[[speed]]
+                    }
+                     Plotly.extendTraces('speedChart', speedTrace, [0], x_max);
+
                  }
-                 <!-- paper_bgcolor: '#000000', -->
-                  <!-- plot_bgcolor: '#c7c7c7' -->
-             };
-             
-             
-             
-             Plotly.react('rpmChart',[{   
-               x:[startTime],
-                 y:[0],
-                 type:'line',
-               line: {
-                  color: rpmColor,
-                  width: 1
-               },
-               fill: 'tozeroy'
-            
-             }], rpmLayout);
-             
-             var cnt = 0;
-             
-             function updateRpmChart(rpm, time) {
-               var scaledRpm = (rpm / 1000).toFixed(3);
-                var rpmTrace = {
-                   x:[[time]],
-                   y:[[scaledRpm]]
+            </script>
+        </div>
+        <div class="wrapper">
+            <div id="rpmChart"></div>
+            <script>
+                var rpmColor = '#00ba00';
+
+                 var rpmLayout = {
+                       autosize: true,
+                       height: 300,
+                       margin: {
+                          l: 55,
+                          r: 10,
+                        b: 25,
+                        t: 10,
+                        pad: 1
+                      },
+                      xaxis: {
+                         <!--tickformat: "%I:%M" -->
+                         tickangle: 0,
+                         nticks: 6,
+                         gridcolor: '#00ba00'
+                      },
+                      yaxis: {
+                         gridcolor: '#00ba00'
+                      },
+                      font: {
+                        size: 20,
+                        color: rpmColor
+                      }
+                      <!-- paper_bgcolor: '#000000', -->
+                       <!-- plot_bgcolor: '#c7c7c7' -->
+                 };
+
+                  Plotly.react('rpmChart',[{
+                    x:[startTime],
+                      y:[0],
+                      type:'line',
+                    line: {
+                       color: rpmColor,
+                       width: 1
+                    },
+                    fill: 'tozeroy'
+
+                  }], rpmLayout);
+
+                  var cnt = 0;
+
+                  function updateRpmChart(rpm, time) {
+                    var scaledRpm = (rpm / 1000).toFixed(3);
+                     var rpmTrace = {
+                        x:[[time]],
+                        y:[[scaledRpm]]
+                     }
+
+                      Plotly.extendTraces('rpmChart', rpmTrace, [0], x_max);
+
+                  }
+            </script>
+        </div>
+        <script>
+            var socket = io();
+            if (socket != null) {
+                $("#statusField").text = "Connected";
+            }
+
+            socket.on("data", function (msg) {
+                var currentTime = new Date($.now());
+
+                var carData = $.parseJSON(msg);
+                var speed = parseInt(carData["speed"]);
+                var rpm = parseInt(carData["rpm"]);
+                var throttle = parseInt(carData["throttle"]);
+                var cabinTemp;
+
+                $("#speedField").text(speed);
+                $("#rpmField").text(rpm);
+                $("#throttleField").text(throttle);
+                updateSpeedChart(speed, currentTime);
+                updateRpmChart(rpm, currentTime);
+            });
+        </script>
+        <div class="container">
+            <table id="myTable" class="table" data-toggle="table" data-mobile-responsive="true" data-pagination="true">
+                <thead>
+                    <tr>
+                        <th>Error Code (DTC)</th>
+                        <th>Description</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <script>
+            var tbody = $("#myTable").children("tbody");
+
+            var table = tbody.length ? tbody : $("#myTable");
+
+            socket.on("faultCodeData", function (faultCodes) {
+                for (var i = 0; i < faultCodes.length; i++) {
+                    var codeDescArray = faultCodes[i];
+                    var code = codeDescArray[0];
+                    var description = codeDescArray[1];
+
+                    //Only add row if fault code doesn't exist in table.
+                    if ($("#" + code).length == 0) {
+                        table.append("<tr id=" + code + "><td>" + code + "</td><td>" + description + "</td></tr>");
+                    } else if ($("#" + code) != null) {
+                    }
                 }
-                
-                 Plotly.extendTraces('rpmChart', rpmTrace, [0], x_max);
-                 
-             }
-         </script>
-      </div>
-      <script>
-         var socket = io();
-         if (socket != null) {
-           $("#statusField").text = "Connected"
-         }
-         
-         socket.on('data', function(msg) {
-            var currentTime = new Date($.now());
-            
-           var carData = $.parseJSON(msg);
-           var speed = parseInt(carData['speed']);
-           var rpm = parseInt(carData['rpm']);
-           var throttle = parseInt(carData['throttle']);
-           var cabinTemp;
-           
-           $("#speedField").text(speed)
-           $("#rpmField").text(rpm)
-           $("#throttleField").text(throttle)
-           updateSpeedChart(speed, currentTime);
-           updateRpmChart(rpm, currentTime);
-         });
-      </script>
-      <div class="container">
-         <table id="myTable" class="table" data-toggle="table" data-mobile-responsive="true" data-pagination="true" >
-            <thead>
-               <tr>
-                  <th>Error Code (DTC)</th>
-                  <th>Description</th>
-                  <th></th>
-               </tr>
-            </thead>
-            <tbody>
-            </tbody>
-         </table>
-      </div>
-      <script>
-         var tbody = $('#myTable').children('tbody');
-         
-             var table = tbody.length ? tbody : $('#myTable');
-             
-             socket.on('faultCodeData', function(faultCodes) {
-             
-             for (var i = 0; i < faultCodes.length; i++) {
-               
-                 var codeDescArray = faultCodes[i];
-                 var code = codeDescArray[0];
-                 var description = codeDescArray[1];
-         
-                 //Only add row if fault code doesn't exist in table. 
-                 if ($('#' + code).length == 0) {
-                     table.append('<tr id=' + code + '><td>' + code + '</td><td>' + description + '</td></tr>');
-                 } else if ($('#' + code) != null) {
-                   
-                 }
-                 
-             }
-             $("#myTable").on('click', '.btnDelete', function() {
-                 $(this).closest('tr').remove();
-               });
-             
-         
-             
-           });
-      </script>
-   </body>
+            });
+        </script>
+    </body>
 </html>
