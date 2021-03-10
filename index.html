@@ -81,21 +81,15 @@
              var cntSpeed = 0;
              
              function updateSpeedChart(speed) {
-                 Plotly.extendTraces('speedChart',{ y:[[speed]]}, [0]);
-                 cntSpeed++;
-                 if(cntSpeed > x_max) {
-                     Plotly.relayout('speedChart',{
-                         xaxis: {
-                             range: [cntSpeed-x_max,cntSpeed]
-                         }
-                     });
-                 }
+                 Plotly.extendTraces('speedChart',{ y:[[speed]]}, [0], x_max);
+                 
              }
          </script>
       </div>
       <div class="wrapper">
          <div id="rpmChart"></div>
          <script>
+           var rpmColor = '#00ba00';
             var rpmLayout = {
                  autosize: true,
                  height: 300,
@@ -108,7 +102,7 @@
                  },
                  font: {
                    size: 20,
-                   color: '#eb3434'
+                   color: rpmColor
                  }
                  <!-- paper_bgcolor: '#000000', -->
                   <!-- plot_bgcolor: '#c7c7c7' -->
@@ -117,22 +111,15 @@
              Plotly.react('rpmChart',[{
                  y:[0],
                  type:'line',
-                                 line: {color: '#eb3434'}
+                                 line: {color: rpmColor}
             
              }], rpmLayout);
              
              var cnt = 0;
              
              function updateRpmChart(rpm) {
-                 Plotly.extendTraces('rpmChart',{ y:[[rpm]]}, [0]);
-                 cnt++;
-                 if(cnt > x_max) {
-                     Plotly.relayout('rpmChart',{
-                         xaxis: {
-                             range: [cnt-x_max,cnt]
-                         }
-                     });
-                 }
+                 Plotly.extendTraces('rpmChart',{ y:[[rpm]]}, [0], x_max);
+                 
              }
          </script>
       </div>

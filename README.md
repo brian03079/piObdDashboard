@@ -1,4 +1,3 @@
-# piObdDashboard
 WIP raspberry-pi server-client app that pulls and displays data from a car's OBD2 port. Currently is able to display speed, rpm, and throttle %. More functionality and stability will be added as I continue working on it.
 
 Helpful links:
@@ -29,16 +28,17 @@ Dependencies:
 
 How to run:
 1. Make sure your car is on with the engine running
-2. Make sure the OBD2 cable is plugged into the pi
+2. Make sure the OBD2 cable is plugged into the pi and car
 3. Launch the server app using the command:
     node index.js
 4. Launch the client app using the command:
     python3 obdDash.py
 5. At this point the light on the OBD adapter should be blinking green, signifying that communication is happening between the car, obd adapter, and pi.
-5. Open a web browser and navigate to localhost:3000
+5. Open a web browser and navigate to the web app localhost:3000
 6. You should begin to see data populating
 
 Notes:
 1. This is WIP, so there will be lots of bugs :). For example there needs to be error handling and reconnection logic.
 2. Did I mention bugs :)))? 
 3. The graph gets updated every 1 second and there is no lag. Increasing this rate may cause the page to "fall behind" or lag when trying to update data, making it innaccurate. Perhaps it is asking too much from a raspberry pi. I am trying to find exactly at what point this starts happening, as well as finding ways to optimize. You can test if there is lag by shutting off the car. If there is no lag then the plotting of data should stop immediately.
+
