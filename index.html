@@ -54,7 +54,9 @@
       <div class="wrapper">
          <div id="speedChart"></div>
          <script>
-            var x_max = 100;
+            var startTime = new Date($.now());
+            var x_max = 500;
+            
              var speedLayout = {
                  autosize: true,
                  height: 300,
@@ -74,14 +76,15 @@
              };
              
              Plotly.react('speedChart',[{
+                  x:[startTime],
                  y:[0],
                  type:'line'
              }], speedLayout);
              
              var cntSpeed = 0;
              
-             function updateSpeedChart(speed) {
-                 Plotly.extendTraces('speedChart',{ y:[[speed]]}, [0], x_max);
+             function updateSpeedChart(speed, time) {
+                 Plotly.extendTraces('speedChart',{ x:[[time]], y:[[speed]]}, [0], x_max);
                  
              }
          </script>
@@ -90,6 +93,7 @@
          <div id="rpmChart"></div>
          <script>
            var rpmColor = '#00ba00';
+
             var rpmLayout = {
                  autosize: true,
                  height: 300,
@@ -108,7 +112,8 @@
                   <!-- plot_bgcolor: '#c7c7c7' -->
              };
              
-             Plotly.react('rpmChart',[{
+             Plotly.react('rpmChart',[{   
+               x:[startTime],
                  y:[0],
                  type:'line',
                                  line: {color: rpmColor}
@@ -117,8 +122,8 @@
              
              var cnt = 0;
              
-             function updateRpmChart(rpm) {
-                 Plotly.extendTraces('rpmChart',{ y:[[rpm]]}, [0], x_max);
+             function updateRpmChart(rpm, time) {
+                 Plotly.extendTraces('rpmChart',{ x:[[time]], y:[[rpm]]}, [0], x_max);
                  
              }
          </script>
@@ -130,8 +135,9 @@
          }
          
          socket.on('data', function(msg) {
+            var currentTime = new Date($.now());
+            
            var carData = $.parseJSON(msg);
-           console.log(carData);
            var speed = parseInt(carData['speed']);
            var rpm = parseInt(carData['rpm']);
            var throttle = parseInt(carData['throttle']);
@@ -140,8 +146,8 @@
            $("#speedField").text(speed)
            $("#rpmField").text(rpm)
            $("#throttleField").text(throttle)
-           updateSpeedChart(speed);
-           updateRpmChart(rpm);
+           updateSpeedChart(speed, currentTime);
+           updateRpmChart(rpm, currentTime);
          });
       </script>
       <div class="container">
