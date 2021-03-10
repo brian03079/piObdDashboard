@@ -14,6 +14,10 @@ io.on('connection', (socket) => {
   socket.on('data', msg => {
     io.emit('data', msg);
   });
+  
+  socket.on('faultCodeData', msg => {
+    io.emit('faultCodeData', msg);
+  });
 });
 
 http.listen(port, () => {

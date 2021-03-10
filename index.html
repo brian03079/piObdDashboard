@@ -24,14 +24,11 @@
       <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css" integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
       <!-- Latest compiled and minified JavaScript -->
       <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.2/socket.io.js"></script>
-
       <div class="container">
-          <span>Status:</span>
-          <span id="statusField"></span>
+         <span>Status:</span>
+         <span id="statusField"></span>
       </div>
       </div>
-      
-      
       <div class="container">
          <div class="row">
             <div class="col-xs-4">
@@ -54,102 +51,153 @@
             </div>
          </div>
       </div>
-      
       <div class="wrapper">
          <div id="speedChart"></div>
          <script>
-           var x_max = 100;
-            var layout = {
-                autosize: true,
-                height: 300,
-                margin: {
-                  l: 20,
-                  r: 10,
-                  b: 20,
-                  t: 10,
-                  pad: 1
-                },
-                <!-- paper_bgcolor: '#000000', -->
-                 <!-- plot_bgcolor: '#c7c7c7' -->
-            };
-            
-            Plotly.react('speedChart',[{
-                y:[0],
-                type:'line'
-            }], layout);
-            
-            var cntSpeed = 0;
-            
-            function updateSpeedChart(speed) {
-                Plotly.extendTraces('speedChart',{ y:[[speed]]}, [0]);
-                cntSpeed++;
-                if(cntSpeed > x_max) {
-                    Plotly.relayout('speedChart',{
-                        xaxis: {
-                            range: [cntSpeed-x_max,cntSpeed]
-                        }
-                    });
-                }
-            }
+            var x_max = 100;
+             var speedLayout = {
+                 autosize: true,
+                 height: 300,
+                 margin: {
+                   l: 55,
+                   r: 10,
+                   b: 25,
+                   t: 10,
+                   pad: 1
+                 },
+                 font: {
+                   size: 20,
+                   color: '#1F77B4'
+                 }
+                 <!-- paper_bgcolor: '#000000', -->
+                  <!-- plot_bgcolor: '#c7c7c7' -->
+             };
+             
+             Plotly.react('speedChart',[{
+                 y:[0],
+                 type:'line'
+             }], speedLayout);
+             
+             var cntSpeed = 0;
+             
+             function updateSpeedChart(speed) {
+                 Plotly.extendTraces('speedChart',{ y:[[speed]]}, [0]);
+                 cntSpeed++;
+                 if(cntSpeed > x_max) {
+                     Plotly.relayout('speedChart',{
+                         xaxis: {
+                             range: [cntSpeed-x_max,cntSpeed]
+                         }
+                     });
+                 }
+             }
          </script>
       </div>
       <div class="wrapper">
          <div id="rpmChart"></div>
          <script>
-            Plotly.react('rpmChart',[{
-                y:[0],
-                type:'line'
-            }], layout);
+            var rpmLayout = {
+                 autosize: true,
+                 height: 300,
+                 margin: {
+                   l: 55,
+                   r: 10,
+                   b: 25,
+                   t: 10,
+                   pad: 1
+                 },
+                 font: {
+                   size: 20,
+                   color: '#eb3434'
+                 }
+                 <!-- paper_bgcolor: '#000000', -->
+                  <!-- plot_bgcolor: '#c7c7c7' -->
+             };
+             
+             Plotly.react('rpmChart',[{
+                 y:[0],
+                 type:'line',
+                                 line: {color: '#eb3434'}
             
-            var cnt = 0;
-            
-            function updateRpmChart(rpm) {
-                Plotly.extendTraces('rpmChart',{ y:[[rpm]]}, [0]);
-                cnt++;
-                if(cnt > x_max) {
-                    Plotly.relayout('rpmChart',{
-                        xaxis: {
-                            range: [cnt-x_max,cnt]
-                        }
-                    });
-                }
-            }
+             }], rpmLayout);
+             
+             var cnt = 0;
+             
+             function updateRpmChart(rpm) {
+                 Plotly.extendTraces('rpmChart',{ y:[[rpm]]}, [0]);
+                 cnt++;
+                 if(cnt > x_max) {
+                     Plotly.relayout('rpmChart',{
+                         xaxis: {
+                             range: [cnt-x_max,cnt]
+                         }
+                     });
+                 }
+             }
          </script>
       </div>
-      
       <script>
-          var socket = io();
-          if (socket != null) {
-            $("#statusField").text = "Connected"
-          }
+         var socket = io();
+         if (socket != null) {
+           $("#statusField").text = "Connected"
+         }
          
-          socket.on('data', function(msg) {
-            var carData = $.parseJSON(msg);
-            console.log(carData);
-            var speed = parseInt(carData['speed']);
-            var rpm = parseInt(carData['rpm']);
-            var throttle = parseInt(carData['throttle']);
-            var cabinTemp;
-            
-            $("#speedField").text(speed)
-            $("#rpmField").text(rpm)
-            $("#throttleField").text(throttle)
-            updateSpeedChart(speed);
-            updateRpmChart(rpm);
-          });
+         socket.on('data', function(msg) {
+           var carData = $.parseJSON(msg);
+           console.log(carData);
+           var speed = parseInt(carData['speed']);
+           var rpm = parseInt(carData['rpm']);
+           var throttle = parseInt(carData['throttle']);
+           var cabinTemp;
+           
+           $("#speedField").text(speed)
+           $("#rpmField").text(rpm)
+           $("#throttleField").text(throttle)
+           updateSpeedChart(speed);
+           updateRpmChart(rpm);
+         });
       </script>
-      
       <div class="container">
-         <div class="row">
-            <div class="col-xs-4">
-               <h4 id=faultCodesHeader>DTC(s):</h4>
-            </div>
-         </div>
-         <div class="row">
-            <div class="col-xs-4">
-               <h6 id=faultCodesHeader>N/A</h6>
-            </div>
-         </div>
+         <table id="myTable" class="table" data-toggle="table" data-mobile-responsive="true" data-pagination="true" >
+            <thead>
+               <tr>
+                  <th>Error Code (DTC)</th>
+                  <th>Description</th>
+                  <th></th>
+               </tr>
+            </thead>
+            <tbody>
+            </tbody>
+         </table>
       </div>
+      <script>
+         var tbody = $('#myTable').children('tbody');
+         
+             var table = tbody.length ? tbody : $('#myTable');
+             
+             socket.on('faultCodeData', function(faultCodes) {
+             
+             for (var i = 0; i < faultCodes.length; i++) {
+               
+                 var codeDescArray = faultCodes[i];
+                 var code = codeDescArray[0];
+                 var description = codeDescArray[1];
+         
+                 //Only add row if fault code doesn't exist in table. 
+                 if ($('#' + code).length == 0) {
+                     table.append('<tr id=' + code + '><td><h5>' + code + '</h5></td><td><h5>' + description + '</h5></td></tr>');
+                 } else if ($('#' + code) != null) {
+                   
+                 }
+                 
+             }
+             $("#myTable").on('click', '.btnDelete', function() {
+                 $(this).closest('tr').remove();
+               });
+             
+         
+             
+           });
+      </script>
    </body>
 </html>

@@ -20,15 +20,6 @@ sio = socketio.Client()
 
 sio.connect('http://localhost:3000')
 
-def randomData():
-    data = {'speed': random.randint(0, 60), 'rpm': random.randint(0, 60), 'throttle': random.randint(0, 60)}
-    return json.dumps(data)
-
-def logData():
-    sio.emit('data', randomData())
-    time.sleep(.2)
-
-
 @sio.on('my message')
 def on_message(data):
     print('I received a message!')
