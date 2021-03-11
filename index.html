@@ -45,6 +45,7 @@
             <script>
                 var startTime = new Date($.now());
                 var x_max = 500;
+                var mphColor = '#1F77B4';
 
                  var speedLayout = {
                      autosize: true,
@@ -61,15 +62,15 @@
                         <!--tickformat: "%I:%M" -->
                         tickangle: 0,
                         nticks: 6,
-                        gridcolor: '#1F77B4'
+                        gridcolor: mphColor
                      },
                      yaxis: {
                         <!-- rangemode:'tozero' -->
-                        gridcolor: '#1F77B4'
+                        gridcolor: mphColor
                      },
                      font: {
                        size: 20,
-                       color: '#1F77B4'
+                       color: mphColor
                      }
                      <!-- paper_bgcolor: '#000000', -->
                       <!-- plot_bgcolor: '#c7c7c7' -->
@@ -101,7 +102,7 @@
         <div class="wrapper">
             <div id="rpmChart"></div>
             <script>
-                var rpmColor = '#00ba00';
+                var rpmColor = '#6EFF6E';
 
                  var rpmLayout = {
                        autosize: true,
@@ -117,10 +118,10 @@
                          <!--tickformat: "%I:%M" -->
                          tickangle: 0,
                          nticks: 6,
-                         gridcolor: '#00ba00'
+                         gridcolor: rpmColor
                       },
                       yaxis: {
-                         gridcolor: '#00ba00'
+                         gridcolor: rpmColor
                       },
                       font: {
                         size: 20,

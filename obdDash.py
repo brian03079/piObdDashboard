@@ -27,25 +27,38 @@ def connect():
     connection = obd.OBD() # auto-connects to USB or RF port
 
     while (True):
-        speedCmd = obd.commands.SPEED # select an OBD command (sensor)
-        response = connection.query(speedCmd) # send the command, and parse the response
-        speed = str(response.value.to("mph").magnitude)
-        
-        rpmCmd = obd.commands.RPM # select an OBD command (sensor)
-        response = connection.query(rpmCmd) # send the command, and parse the response
-        rpm = response.value.magnitude
-        
-        throttleCmd = obd.commands.THROTTLE_POS # select an OBD command (sensor)
-        response = connection.query(throttleCmd) # send the command, and parse the response
-        throttle = str(response.value.magnitude)
+        try:
+            speedCmd = obd.commands.SPEED # select an OBD command (sensor)
+            response = connection.query(speedCmd) # send the command, and parse the response
+            speed = str(response.value.to("mph").magnitude)
+            
+            rpmCmd = obd.commands.RPM # select an OBD command (sensor)
+            response = connection.query(rpmCmd) # send the command, and parse the response
+            rpm = response.value.magnitude
+            
+            throttleCmd = obd.commands.THROTTLE_POS # select an OBD command (sensor)
+            response = connection.query(throttleCmd) # send the command, and parse the response
+            throttle = str(response.value.magnitude)
+            
+            dtcCmd = obd.commands.GET_DTC # select an OBD command (sensor)
+            response = connection.query(dtcCmd) # send the command, and parse the response
+            dtcCodes = response.value
 
-        data = {'speed': speed, 'rpm': rpm, 'throttle': throttle}
-        sio.emit('data', json.dumps(data))
-        time.sleep(.25)
+            data = {'speed': speed, 'rpm': rpm, 'throttle': throttle}
+            sio.emit('data', json.dumps(data))
+            time.sleep(.25)
+        except:
+            print("Car connection lost. Attempting reconnect.")
+            time.sleep(1)
+            connection = obd.OBD()
+            
 
+#attempt to reconnect on connection error
 @sio.event
 def connect_error():
-    print("The connection failed!")
+    print("Connection failed! Retrying in 3s")
+    time.sleep(3)
+    sio.connect('http://localhost:3000')
 
 @sio.event
 def disconnect():
