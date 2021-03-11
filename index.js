@@ -21,6 +21,10 @@ io.on('connection', (socket) => {
   socket.on('faultCodeData', msg => {
     io.emit('faultCodeData', msg);
   });
+  
+  socket.on('cabinTempHumidity', msg => {
+    io.emit('cabinTempHumidity', msg);
+  });
 });
 
 http.listen(port, () => {

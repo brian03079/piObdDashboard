@@ -12,9 +12,18 @@ import time
 import re
 import plotly.graph_objs as go 
 from collections import deque 
+from obd import OBDStatus
+
+connection = obd.OBD()
+
+while not obd.is_connected():
+    print(Initial OBD connection failed. Retrying.")
+    sleep(1);
+    connection = obd.OBD()
+    
+print("OBD connection established!")
 
 sio = socketio.Client()
-
 sio.connect('http://localhost:3000')
 
 @sio.on('my message')
@@ -23,8 +32,7 @@ def on_message(data):
 
 @sio.event
 def connect():
-    print("Connected!")
-    connection = obd.OBD() # auto-connects to USB or RF port
+    print("Connected to node server!")
 
     while (True):
         try:
@@ -46,9 +54,9 @@ def connect():
 
             data = {'speed': speed, 'rpm': rpm, 'throttle': throttle}
             sio.emit('data', json.dumps(data))
-            time.sleep(.25)
+            time.sleep(.3)
         except:
-            print("Car connection lost. Attempting reconnect.")
+            print("No connection to car. Attempting reconnect.")
             time.sleep(1)
             connection = obd.OBD()
             
@@ -56,7 +64,7 @@ def connect():
 #attempt to reconnect on connection error
 @sio.event
 def connect_error():
-    print("Connection failed! Retrying in 3s")
+    print("Node server connect failed. Retrying.")
     time.sleep(3)
     sio.connect('http://localhost:3000')
 

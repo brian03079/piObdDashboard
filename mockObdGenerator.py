@@ -35,7 +35,7 @@ def generateData():
 def sendData():
     sio.emit('data', generateData())
     sio.emit('faultCodeData', generateFaultCodes())
-    time.sleep(.2)
+    time.sleep(.3)
 
 @sio.on('my message')
 def on_message(data):

@@ -36,11 +36,14 @@
                 </div>
                 <div class="col-xs-4 right">
                     <h3 id="cabinTempField">--</h3>
-                    <h6>Cabin Temp (F)</h6>
+                    <h6>Cabin Temp (F) / Humidity %</h6>
                 </div>
             </div>
         </div>
         <div class="wrapper">
+            <script>
+               
+            </script>
             <div id="speedChart"></div>
             <script>
                 var startTime = new Date($.now());
@@ -90,6 +93,8 @@
                  var cntSpeed = 0;
 
                  function updateSpeedChart(speed, time) {
+                    $("#speedField").text(speed);
+                    
                     var speedTrace = {
                        x:[[time]],
                        y:[[speed]]
@@ -102,7 +107,7 @@
         <div class="wrapper">
             <div id="rpmChart"></div>
             <script>
-                var rpmColor = '#6EFF6E';
+                var rpmColor = '#00ba00';
 
                  var rpmLayout = {
                        autosize: true,
@@ -146,7 +151,9 @@
                   var cnt = 0;
 
                   function updateRpmChart(rpm, time) {
-                    var scaledRpm = (rpm / 1000).toFixed(3);
+                     $("#rpmField").text(rpm);
+                     
+                     var scaledRpm = (rpm / 1000).toFixed(3);
                      var rpmTrace = {
                         x:[[time]],
                         y:[[scaledRpm]]
@@ -158,6 +165,9 @@
             </script>
         </div>
         <script>
+            function updateCabinTempHumidity(temp, humidity) {
+               $("#cabinTempField").text(temp + "\t\t" + humidity);
+            }
             var socket = io();
             if (socket != null) {
                 $("#statusField").text = "Connected";
@@ -172,11 +182,18 @@
                 var throttle = parseInt(carData["throttle"]);
                 var cabinTemp;
 
-                $("#speedField").text(speed);
-                $("#rpmField").text(rpm);
                 $("#throttleField").text(throttle);
+                
                 updateSpeedChart(speed, currentTime);
                 updateRpmChart(rpm, currentTime);
+            });
+            
+            socket.on("cabinTempHumidity", function (msg) {
+               var data = $.parseJSON(msg);
+               var temp = data["temp"];
+               var humidity = data["humidity"];
+               
+               updateCabinTempHumidity(temp, humidity);
             });
         </script>
         <div class="container">
