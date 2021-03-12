@@ -59,7 +59,7 @@ def emitDtcCodes():
             currentDtcCodes.pop(i)
                     
     if dtcCodesChanged:
-        sio.emit('faultCodeData', currentDtcCodes())
+        sio.emit('dtcData', currentDtcCodes())
         dtcCodesChanged = False
 
 @sio.on('my message')

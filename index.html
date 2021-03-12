@@ -36,11 +36,11 @@
                 </div>
                 <div class="col-xs-4 pad-left">
                     <h3 id="cabinTempField">--</h3>
-                    <h6>Cabin Temp (F)</h6>
+                    <h6 id="cabinTempHeader">Cabin Temp</h6>
                 </div>
                 <div class="col-xs-4 pad-left">
                     <h3 id="cabinHumidityField">--</h3>
-                    <h6>Humidity %</h6>
+                    <h6>% Humidity</h6>
                 </div>
             </div>
         </div>
@@ -50,6 +50,10 @@
             </script>
             <div id="speedChart"></div>
             <script>
+                var degreeSymbol = String.fromCharCode(176);
+                var degreeMetric = "F";
+                $("#cabinTempHeader").text("Cabin Temp " + degreeSymbol + degreeMetric);
+                
                 var startTime = new Date($.now());
                 var x_max = 500;
                 var mphColor = '#1F77B4';
@@ -170,8 +174,8 @@
         </div>
         <script>
             function updateCabinTempHumidity(temp, humidity) {
-               $("#cabinTempField").text(temp);
-               $("#cabinHumidityField").text(humidity);
+                $("#cabinTempField").text(temp);
+                $("#cabinHumidityField").text(humidity);
             }
             var socket = io();
             if (socket != null) {
@@ -217,14 +221,15 @@
             var tbody = $("#myTable").children("tbody");
             var table = tbody.length ? tbody : $("#myTable");
 
-            socket.on("faultCodeData", function (faultCodes) {
+            //this should only get called when there is a change in DTC(s). That logic
+            //is handled in piObd.py. We clear the table and add the codes + descriptions
+            socket.on("dtcData", function (faultCodes) { 
                 table.empty();
                 for (var i = 0; i < faultCodes.length; i++) {
                     var codeDescArray = faultCodes[i];
                     var code = codeDescArray[0];
                     var description = codeDescArray[1];
 
-                    //Only add row if fault code doesn't exist in table.
                     table.append("<tr id=" + code + "><td>" + code + "</td><td>" + description + "</td></tr>");
                 }
             });

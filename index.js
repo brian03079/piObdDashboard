@@ -18,8 +18,8 @@ io.on('connection', (socket) => {
     io.emit('data', msg);
   });
   
-  socket.on('faultCodeData', msg => {
-    io.emit('faultCodeData', msg);
+  socket.on('dtcData', msg => {
+    io.emit('dtcData', msg);
   });
   
   socket.on('cabinTempHumidity', msg => {
