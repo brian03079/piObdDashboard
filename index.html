@@ -98,10 +98,14 @@
                    fill: 'tozeroy'
                  }], speedLayout);
 
-                 var cntSpeed = 0;
 
                  function updateSpeedChart(speed, time) {
+                    var speedingSpeed = 85000;
+                    var warningSpeed = 80;
+                    var parsedSpeed = parseInt(speed);
+                    
                     $("#speedField").text(speed);
+
                     
                     var speedTrace = {
                        x:[[time]],
@@ -159,8 +163,20 @@
                   var cnt = 0;
 
                   function updateRpmChart(rpm, time) {
-                     $("#rpmField").text(rpm);
-                     
+                    var highRpm = 7000;
+                    var mediumRpm = 4500;
+                    var parsedRpm = parseInt(rpm);
+                    
+                    $("#rpmField").text(rpm);
+                    
+                    if (parsedRpm >= highRpm) {
+                        $("#rpmField").css('color', 'red');
+                    } else if (parsedRpm >= mediumRpm && parsedRpm < highRpm) {
+                        $("#rpmField").css('color', 'orange');
+                    } else {
+                        $("#rpmField").css('color', rpmColor);
+                    }
+                                         
                      var scaledRpm = (rpm / 1000).toFixed(3);
                      var rpmTrace = {
                         x:[[time]],
