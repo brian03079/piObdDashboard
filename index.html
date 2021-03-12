@@ -18,25 +18,29 @@
             <span id="statusField"></span>
         </div>
 
-        <div class="container">
+        <div class="container pad-left">
             <div class="row">
-                <div class="col-xs-4 left pad-left">
+                <div class="col-xs-4 left">
                     <h1 class="mph" id="speedField">--</h1>
                     <h4>MPH</h4>
                 </div>
-                <div class="col-xs-4 right">
+                <div class="col-xs-4 pad-left">
                     <h1 class="rpm" id="rpmField">--</h1>
                     <h4>RPM</h4>
                 </div>
             </div>
             <div class="row">
-                <div class="col-xs-4 left pad-left">
+                <div class="col-xs-4">
                     <h3 id="throttleField">--</h3>
                     <h6>% Throttle</h6>
                 </div>
-                <div class="col-xs-4 right">
+                <div class="col-xs-4 pad-left">
                     <h3 id="cabinTempField">--</h3>
-                    <h6>Cabin Temp (F) / Humidity %</h6>
+                    <h6>Cabin Temp (F)</h6>
+                </div>
+                <div class="col-xs-4 pad-left">
+                    <h3 id="cabinHumidityField">--</h3>
+                    <h6>Humidity %</h6>
                 </div>
             </div>
         </div>
@@ -166,7 +170,8 @@
         </div>
         <script>
             function updateCabinTempHumidity(temp, humidity) {
-               $("#cabinTempField").text(temp + "\t\t" + humidity);
+               $("#cabinTempField").text(temp);
+               $("#cabinHumidityField").text(humidity);
             }
             var socket = io();
             if (socket != null) {
