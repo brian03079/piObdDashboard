@@ -215,20 +215,17 @@
         </div>
         <script>
             var tbody = $("#myTable").children("tbody");
-
             var table = tbody.length ? tbody : $("#myTable");
 
             socket.on("faultCodeData", function (faultCodes) {
+                table.empty();
                 for (var i = 0; i < faultCodes.length; i++) {
                     var codeDescArray = faultCodes[i];
                     var code = codeDescArray[0];
                     var description = codeDescArray[1];
 
                     //Only add row if fault code doesn't exist in table.
-                    if ($("#" + code).length == 0) {
-                        table.append("<tr id=" + code + "><td>" + code + "</td><td>" + description + "</td></tr>");
-                    } else if ($("#" + code) != null) {
-                    }
+                    table.append("<tr id=" + code + "><td>" + code + "</td><td>" + description + "</td></tr>");
                 }
             });
         </script>
