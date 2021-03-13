@@ -28,7 +28,7 @@ def generateFaultCodes():
 def generateData():
     
     data = {'speed': random.randint(75, 85),
-        'rpm': random.randint(700, 1500),
+        'rpm': random.randint(700, 7500),
         'throttle': random.randint(40, 60)}
     return json.dumps(data)
 

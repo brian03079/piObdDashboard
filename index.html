@@ -69,8 +69,10 @@
                 $("#cabinTempHeader").text("Cabin Temp " + degreeSymbol + degreeMetric);
 
                 var startTime = new Date($.now());
-                var x_max = 500;
-                var mphColor = '#1F77B4';
+                var x_max = 500; //max number of data points per plot
+                var defaultColor = '#00ba00';
+                var plotBackgroundColor = '#000000';
+                
 
                  var speedLayout = {
                      autosize: true,
@@ -87,18 +89,18 @@
                         <!--tickformat: "%I:%M" -->
                         tickangle: 0,
                         nticks: 6,
-                        gridcolor: mphColor
+                        gridcolor: defaultColor
                      },
                      yaxis: {
                         <!-- rangemode:'tozero' -->
-                        gridcolor: mphColor
+                        gridcolor: defaultColor
                      },
                      font: {
                        size: 20,
-                       color: mphColor
-                     }
-                     <!-- paper_bgcolor: '#000000', -->
-                      <!-- plot_bgcolor: '#c7c7c7' -->
+                       color: defaultColor
+                     },
+                     paper_bgcolor: plotBackgroundColor,
+                     plot_bgcolor: plotBackgroundColor
                  };
 
                  Plotly.react('speedChart',[{
@@ -107,6 +109,7 @@
                      type:'line',
 
                      line: {
+                        color: defaultColor,
                       width: 1
                    },
                    fill: 'tozeroy'
@@ -133,8 +136,6 @@
         <div class="wrapper">
             <div id="rpmChart"></div>
             <script>
-                var rpmColor = '#00ba00';
-
                  var rpmLayout = {
                        autosize: true,
                        height: 300,
@@ -149,17 +150,17 @@
                          <!--tickformat: "%I:%M" -->
                          tickangle: 0,
                          nticks: 6,
-                         gridcolor: rpmColor
+                         gridcolor: defaultColor
                       },
                       yaxis: {
-                         gridcolor: rpmColor
+                         gridcolor: defaultColor
                       },
                       font: {
                         size: 20,
-                        color: rpmColor
-                      }
-                      <!-- paper_bgcolor: '#000000', -->
-                       <!-- plot_bgcolor: '#c7c7c7' -->
+                        color: defaultColor
+                      },
+                      paper_bgcolor: plotBackgroundColor,
+                      plot_bgcolor: plotBackgroundColor
                  };
 
                   Plotly.react('rpmChart',[{
@@ -167,7 +168,7 @@
                       y:[0],
                       type:'line',
                     line: {
-                       color: rpmColor,
+                       color: defaultColor,
                        width: 1
                     },
                     fill: 'tozeroy'
@@ -186,9 +187,9 @@
                     if (parsedRpm >= highRpm) {
                         $("#rpmField").css('color', 'red');
                     } else if (parsedRpm >= mediumRpm && parsedRpm < highRpm) {
-                        $("#rpmField").css('color', 'orange');
+                        $("#rpmField").css('color', 'yellow');
                     } else {
-                        $("#rpmField").css('color', rpmColor);
+                        $("#rpmField").css('color', defaultColor);
                     }
 
                      var scaledRpm = (rpm / 1000).toFixed(3);
