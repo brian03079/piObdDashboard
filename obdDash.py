@@ -15,10 +15,10 @@ dtcCodesChanged = False
 
 connection = obd.OBD()
 
-while not obd.is_connected():
-    print("Initial OBD connection failed. Retrying.")
-    sleep(1);
-    connection = obd.OBD()
+# while not obd.is_connected():
+    # print("Initial OBD connection failed. Retrying.")
+    # sleep(1);
+    # connection = obd.OBD()
     
 print("OBD connection established!")
 
@@ -26,7 +26,7 @@ sio = socketio.Client()
 sio.connect('http://localhost:3000')
 
 def emitBaseTelemetry():
-    
+
     speedCmd = obd.commands.SPEED # select an OBD command (sensor)
     response = connection.query(speedCmd) # send the command, and parse the response
     speed = str(response.value.to("mph").magnitude)
@@ -44,6 +44,7 @@ def emitBaseTelemetry():
 
 def emitDtcCodes():
     
+    global dtcCodesChanged
     dtcCmd = obd.commands.GET_DTC
     response = connection.query(dtcCmd)
     dtcCodes = response.value
@@ -71,15 +72,11 @@ def connect():
     print("Connected to node server!")
 
     while (True):
-        try:
             emitBaseTelemetry()
             emitDtcCodes()
             
             time.sleep(.3) #fastest refresh speed before web app begins to lag
-        except:
-            print("No connection to car. Attempting reconnect.")
-            time.sleep(1)
-            connection = obd.OBD()
+
             
 
 #attempt to reconnect on connection error
