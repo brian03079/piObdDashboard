@@ -20,31 +20,59 @@
 
         <div class="container">
             <div class="row">
-                <div class="col-xs-4 left pad-left">
-                    <h1 class="mph" id="speedField">--</h1>
-                    <h4>MPH</h4>
-                </div>
-                <div class="col-xs-4 right">
-                    <h1 class="rpm" id="rpmField">--</h1>
-                    <h4>RPM</h4>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-xs-4 left pad-left">
-                    <h3 id="throttleField">--</h3>
-                    <h6>% Throttle</h6>
-                </div>
-                <div class="col-xs-4 right">
-                    <h3 id="cabinTempField">--</h3>
-                    <h6>Cabin Temp (F)</h6>
-                </div>
+ 
+                
+                <table class="telemetry-table">
+                    <tbody>
+                        <tr>
+                            <td>
+                              <h4 class="pad-left">MPH</h4>
+                                <h1 class="mph pad-right" id="speedField">--</h1>
+                                
+                            </td>
+                            <td>
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td><h4>RPM</h4></td>
+                                        </tr>
+                                        <tr>
+                                            <td><h1 class="rpm rpmCell" id="rpmField">--</h1></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="pad-top"><h3 id="throttleField">--</h3></td>
+                                            <td  class="col-sm-4"><h3 id="cabinTempField">--</h3></td>
+                                            <td class="col-sm-4"><h3 id="cabinHumidityField">--</h3></td>
+                                        </tr>
+                                        <tr>
+                                            <td><h6>% Throttle</h6></td>
+                                            <td class="col-sm-4"><h6 id="cabinTempHeader">Cabin Temp</h6></td>
+                                            <td class="col-sm-4"><h6>% Humidity</h6></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                
+                
             </div>
         </div>
         <div class="wrapper">
+            <script></script>
             <div id="speedChart"></div>
             <script>
+                var degreeSymbol = String.fromCharCode(176);
+                var degreeMetric = "F";
+                $("#cabinTempHeader").text("Cabin Temp " + degreeSymbol + degreeMetric);
+
                 var startTime = new Date($.now());
-                var x_max = 500;
+                var x_max = 500; //max number of data points per plot
+                var defaultColor = '#00ba00';
+                var plotBackgroundColor = '#000000';
+                
 
                  var speedLayout = {
                      autosize: true,
@@ -61,18 +89,18 @@
                         <!--tickformat: "%I:%M" -->
                         tickangle: 0,
                         nticks: 6,
-                        gridcolor: '#1F77B4'
+                        gridcolor: defaultColor
                      },
                      yaxis: {
                         <!-- rangemode:'tozero' -->
-                        gridcolor: '#1F77B4'
+                        gridcolor: defaultColor
                      },
                      font: {
                        size: 20,
-                       color: '#1F77B4'
-                     }
-                     <!-- paper_bgcolor: '#000000', -->
-                      <!-- plot_bgcolor: '#c7c7c7' -->
+                       color: defaultColor
+                     },
+                     paper_bgcolor: plotBackgroundColor,
+                     plot_bgcolor: plotBackgroundColor
                  };
 
                  Plotly.react('speedChart',[{
@@ -81,14 +109,21 @@
                      type:'line',
 
                      line: {
+                        color: defaultColor,
                       width: 1
                    },
                    fill: 'tozeroy'
                  }], speedLayout);
 
-                 var cntSpeed = 0;
 
                  function updateSpeedChart(speed, time) {
+                    var speedingSpeed = 85000;
+                    var warningSpeed = 80;
+                    var parsedSpeed = parseInt(speed);
+
+                    $("#speedField").text(speed);
+
+
                     var speedTrace = {
                        x:[[time]],
                        y:[[speed]]
@@ -101,8 +136,6 @@
         <div class="wrapper">
             <div id="rpmChart"></div>
             <script>
-                var rpmColor = '#00ba00';
-
                  var rpmLayout = {
                        autosize: true,
                        height: 300,
@@ -117,17 +150,17 @@
                          <!--tickformat: "%I:%M" -->
                          tickangle: 0,
                          nticks: 6,
-                         gridcolor: '#00ba00'
+                         gridcolor: defaultColor
                       },
                       yaxis: {
-                         gridcolor: '#00ba00'
+                         gridcolor: defaultColor
                       },
                       font: {
                         size: 20,
-                        color: rpmColor
-                      }
-                      <!-- paper_bgcolor: '#000000', -->
-                       <!-- plot_bgcolor: '#c7c7c7' -->
+                        color: defaultColor
+                      },
+                      paper_bgcolor: plotBackgroundColor,
+                      plot_bgcolor: plotBackgroundColor
                  };
 
                   Plotly.react('rpmChart',[{
@@ -135,7 +168,7 @@
                       y:[0],
                       type:'line',
                     line: {
-                       color: rpmColor,
+                       color: defaultColor,
                        width: 1
                     },
                     fill: 'tozeroy'
@@ -145,7 +178,21 @@
                   var cnt = 0;
 
                   function updateRpmChart(rpm, time) {
-                    var scaledRpm = (rpm / 1000).toFixed(3);
+                    var highRpm = 6500;
+                    var mediumRpm = 4000;
+                    var parsedRpm = parseInt(rpm);
+
+                    $("#rpmField").text(rpm);
+
+                    if (parsedRpm >= highRpm) {
+                        $("#rpmField").css('color', 'red');
+                    } else if (parsedRpm >= mediumRpm && parsedRpm < highRpm) {
+                        $("#rpmField").css('color', 'yellow');
+                    } else {
+                        $("#rpmField").css('color', defaultColor);
+                    }
+
+                     var scaledRpm = (rpm / 1000).toFixed(3);
                      var rpmTrace = {
                         x:[[time]],
                         y:[[scaledRpm]]
@@ -157,6 +204,10 @@
             </script>
         </div>
         <script>
+            function updateCabinTempHumidity(temp, humidity) {
+                $("#cabinTempField").text(temp);
+                $("#cabinHumidityField").text(humidity);
+            }
             var socket = io();
             if (socket != null) {
                 $("#statusField").text = "Connected";
@@ -171,11 +222,18 @@
                 var throttle = parseInt(carData["throttle"]);
                 var cabinTemp;
 
-                $("#speedField").text(speed);
-                $("#rpmField").text(rpm);
                 $("#throttleField").text(throttle);
+
                 updateSpeedChart(speed, currentTime);
                 updateRpmChart(rpm, currentTime);
+            });
+
+            socket.on("cabinTempHumidity", function (msg) {
+                var data = $.parseJSON(msg);
+                var temp = data["temp"];
+                var humidity = data["humidity"];
+
+                updateCabinTempHumidity(temp, humidity);
             });
         </script>
         <div class="container">
@@ -192,20 +250,18 @@
         </div>
         <script>
             var tbody = $("#myTable").children("tbody");
-
             var table = tbody.length ? tbody : $("#myTable");
 
-            socket.on("faultCodeData", function (faultCodes) {
+            //this should only get called when there is a change in DTC(s). That logic
+            //is handled in piObd.py. We clear the table and add the codes + descriptions
+            socket.on("dtcData", function (faultCodes) {
+                table.empty();
                 for (var i = 0; i < faultCodes.length; i++) {
                     var codeDescArray = faultCodes[i];
                     var code = codeDescArray[0];
                     var description = codeDescArray[1];
 
-                    //Only add row if fault code doesn't exist in table.
-                    if ($("#" + code).length == 0) {
-                        table.append("<tr id=" + code + "><td>" + code + "</td><td>" + description + "</td></tr>");
-                    } else if ($("#" + code) != null) {
-                    }
+                    table.append("<tr id=" + code + "><td>" + code + "</td><td>" + description + "</td></tr>");
                 }
             });
         </script>
