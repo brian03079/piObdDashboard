@@ -6,19 +6,19 @@ https://dash.plotly.com/
 https://socket.io/get-started/chat
 
 Required hardware:
-1. OBD usb cable
+1. OBD usb cable [Link](https://www.amazon.com/gp/product/B081VQVD3F/ref=ppx_yo_dt_b_asin_title_o07_s00?ie=UTF8&psc=1)
     -bluetooth ones should work, but I opted for a usb cable for better security, reliability, and not having to worry about battery drain
     -I used an OBDLink EX FORScan OBD Adapter. Others may also work.
-3. Raspberry pi running raspberry pi os (I used a pi 4 with 4gb ram)
+3. Raspberry pi running raspberry pi os [Link](https://www.sparkfun.com/products/15447)
 4. SD card
-5. External display
-6. HDMI cable
+5. External display [Link](https://www.amazon.com/gp/product/B07S51QDTG/ref=ppx_yo_dt_b_asin_title_o06_s00?ie=UTF8&psc=1)
+6. HDMI to micro HDMI cable or adapter
 7. Power cable for the pi
 8. Way to power the pi (ie. power bank, cigarette to usb car plug adapter)
 
 Optional hardware:
-1. (Optional) DHT22/11 temp and humidity sensor
-2. PiJuice HAT uninterruptible power supply (ups) - This will prevent hard shutdowns on the pi when the car is turned off. I am also tweaking start/shutdown scripts to automate everything. 
+1. (Optional) DHT22/11 temp and humidity sensor [Link](https://www.amazon.com/gp/product/B073F472JL/ref=ppx_yo_dt_b_search_asin_image?ie=UTF8&psc=1)
+2. PiJuice HAT uninterruptible power supply [Link](https://www.sparkfun.com/products/14803) - This will prevent hard shutdowns on the pi when the car is turned off. I am also tweaking start/shutdown scripts to automate everything. 
 
 Dependencies:
 1. nodejs
