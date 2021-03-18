@@ -1,4 +1,5 @@
 import os
+import time
 from pijuice import PiJuice # Import pijuice module
 from subprocess import call
 
@@ -12,10 +13,11 @@ def shutdownPi():
     
 def checkPower():
     power_status = pijuice.status.GetStatus()['data']['powerInput']
-            
-        if(power_status == NO_AC):
-            os.system("pkill -o chromium") #gracefully exit chrome to allow proper startup on next start instead of showing error + new tab page
-            #shutdownPi() #commented out because I am handling shutdown using my pi dashcam app
+    
+    if(power_status == NO_AC):
+        os.system("pkill -o chromium") #gracefully exit chrome to allow proper startup on next start instead of showing error + new tab page
+        #shutdownPi() #commented out because I am handling shutdown using my pi dashcam app
 
-
-checkPower()
+while True:
+    checkPower()
+    time.sleep(2)
