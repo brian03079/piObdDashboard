@@ -18,7 +18,7 @@ Required hardware:
     -I used an OBDLink EX FORScan OBD Adapter. Others may also work.
 3. Raspberry pi running raspberry pi os [Link](https://www.sparkfun.com/products/15447)
 4. SD card
-5. External display [Link](https://www.amazon.com/gp/product/B07S51QDTG/ref=ppx_yo_dt_b_asin_title_o06_s00?ie=UTF8&psc=1) (optional if you are using your phone to connect to the pi via pi as hotspot)
+5. External display [Link](https://www.amazon.com/gp/product/B07S51QDTG/ref=ppx_yo_dt_b_asin_title_o06_s00?ie=UTF8&psc=1) (optional if you are using your phone to connect to the pi via phone hotspot sharing)
 6. HDMI to micro HDMI cable or adapter (optional, see above)
 7. Power cable for the pi
 8. Way to power the pi (ie. power bank, cigarette to usb car plug adapter)
@@ -47,7 +47,7 @@ How to run:
 5. (Optional) If you have a DHT22/11 sensor hooked up to the pi, launch the python temperature/humidity logger app:
     python3 tempMonitor.py
 5. After launching obdDash.py, you should see "Connected to node server!" and the light on the OBD adapter should be blinking green, signifying that communication is happening between the car, obd adapter, and pi.
-5. Open a web browser and navigate to the web app. This can be done on the pi itself (simply "localhost:3000", or your phone. You will almost certainly get much better performance using your phone and each method has its benefits. To use your phone, set your pi as a hotspot. Next, find out the ip address of your pi and enter it into your browser followed by the port number like "192.168.1.20:3000").
+5. Open a web browser and navigate to the web app localhost:3000. This can be done on the pi itself, or your phone. You will almost certainly get much better performance using your phone and each method has its benefits. To use your phone, enable hotspot sharing and connect your pi to it. Next, find out the ip address given to your pi (ie. 192.168.1.20) and enter it into your browser followed by the port number like "192.168.1.20:3000").
 6. Data should start populating. The axes on the graphs auto resize based on the speed, rpm, and time. Each graph also has adjustment options if you hover over the top right of each.
 
 Notes:
