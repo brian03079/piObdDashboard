@@ -1,8 +1,10 @@
 body {
      margin: 0;
+     padding: 0;
      background-color: black !important;
      color: #00ba00 !important;
-     padding-bottom: 3rem;
+     padding-bottom: .5rem;
+     padding-top: .5rem;
      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
@@ -14,8 +16,26 @@ th, td {
      font-size: 14px;
 }
 
+#sensorDumpButton, #homeButton {
+     color: #00ba00;
+}
+
+#homePage  {
+     width: 100%;
+     padding: 0;
+   margin: 0;
+}
+
+#dtcContainer {
+     padding-top: 1rem;
+}
+
 #plot {
   background-color: black;
+}
+
+#speedField {
+     width: 150px;
 }
 
 .left {

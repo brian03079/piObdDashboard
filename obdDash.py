@@ -72,12 +72,9 @@ def connect():
     print("Connected to node server!")
 
     while (True):
-            emitBaseTelemetry()
-            emitDtcCodes()
-            
-            time.sleep(.3) #fastest refresh speed before web app begins to lag
-
-            
+        emitBaseTelemetry()
+        emitDtcCodes()
+        time.sleep(.3) #fastest refresh speed before web app begins to lag. If you are using your phone to connect, then even .15s is fine (tested on pixel 3a)
 
 #attempt to reconnect on connection error
 @sio.event
