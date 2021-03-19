@@ -5,6 +5,11 @@ import json
 import obd
 import time
 
+obd2CmdListFile = open('obd2CmdsList.json',) 
+obdCmdList = json.load(obd2CmdListFile)
+
+obd2CmdListFile.close()
+
 
 sio = socketio.Client()
 
@@ -29,9 +34,17 @@ def sendData():
     sio.emit('dtcData', generateFaultCodes())
     time.sleep(1)
 
-@sio.on('my message')
+@sio.on('sensorDumpRequest')
 def on_message(data):
-    print('I received a message!')
+    
+    obdCmdResponseList = []
+
+    for obdCmd in obdCmdList: 
+        #response = connection.query(obdCmd['Name']) # send the command, and parse the response
+        
+        obdCmdResponseList.append(obdCmd)
+
+    sio.emit('sensorDumpData', obdCmdResponseList)
 
 @sio.event
 def connect():

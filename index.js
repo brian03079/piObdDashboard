@@ -25,6 +25,14 @@ io.on('connection', (socket) => {
   socket.on('cabinTempHumidity', msg => {
     io.emit('cabinTempHumidity', msg);
   });
+  
+  socket.on('sensorDumpData', msg => {
+    io.emit('sensorDumpData', msg);
+  });
+  
+  socket.on('sensorDumpRequest', msg => {
+    io.emit('sensorDumpRequest', msg);
+  });
 });
 
 http.listen(port, () => {
