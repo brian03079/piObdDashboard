@@ -23,10 +23,15 @@ def generateFaultCodes():
         ]
     
 def generateData():
-    
+    idleTime = round(random.uniform(10.5, 75.5), 1)
+    print(idleTime)
+
     data = {'speed': random.randint(75, 85),
         'rpm': random.randint(700, 7500),
-        'throttle': random.randint(40, 60)}
+        'throttle': random.randint(40, 60),
+        'runTime': random.randint(60, 90),
+        'idleTime': idleTime}
+        
     return json.dumps(data)
 
 def sendData():

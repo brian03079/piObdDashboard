@@ -10,6 +10,11 @@ from collections import deque
 from obd import OBDStatus
 
 
+delay = 0.3 #Delay in seconds before sending data
+
+idleTime = 0.0 #Time the engine is idling in seconds
+maxIdleRpm = 1000 #rpm threshold that helps define if engine is idling
+
 currentDtcCodes = []
 dtcCodesChanged = False
 
@@ -39,7 +44,17 @@ def emitBaseTelemetry():
     response = connection.query(throttleCmd)
     throttle = str(response.value.magnitude)
     
-    data = {'speed': speed, 'rpm': rpm, 'throttle': throttle}
+    runTimeCmd = obd.commands.RUN_TIME
+    response = connection.query(runTimeCmd)
+    runTime = str(response.value.magnitude)
+    
+    pedalPosCmd = obd.commands.ACCELERATOR_POS #percent of pedal being pushed down. 
+    response = connection.query(pedalPosCmd)
+    pedalPos = str(response.value.magnitude)
+    
+    idleTime = (idleTime + delay) if rpm <= maxIdleRpm else idleTime #this will have one decimal place. Parse on front end
+    
+    data = {'speed': speed, 'rpm': rpm, 'throttle': throttle, 'runtime': runtime, 'idleTime': idleTime}
     sio.emit('data', json.dumps(data))
 
 def emitDtcCodes():

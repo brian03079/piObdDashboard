@@ -16,9 +16,14 @@
 		<link rel="stylesheet" type="text/css" href="/css/bootstrap-theme.min.css" />
     <link rel="stylesheet" type="text/css" href="/css/index.css" />
 		<script src="/js/socket.io.min.js"></script>
-		<ul class="nav justify-content-end">
-			<li class="nav-item"> <a id="sensorDumpButton" class="nav-link">Sensor Dump</a> </li>
-			<li class="nav-item"> <a id="homeButton" class="nav-link">Home</a> </li>
+		<ul class="nav justify-content-start">
+
+        <h6 class="nav-item ml-auto">Runtime:</h6>
+        <h6 class="nav-item ml-auto" id="runTimeField">--</h6>
+        <h6 class="nav-item ml-auto">Idle:</h6>
+        <h6 class="nav-item ml-auto" id="idleTimeField">--</h6>
+			<li class="nav-item ml-auto"> <a id="sensorDumpButton" class="nav-link">Sensor Dump</a> </li>
+			<li class="nav-item ml-auto"> <a id="homeButton" class="nav-link">Home</a> </li>
 		</ul>
 		<div class="container-fluid">
 			<div class="row">
@@ -91,6 +96,12 @@
                 document.msExitFullscreen();
             }
         }
+      }
+      
+      function secondsToHHMMSS(seconds) {
+        var date = new Date(null);
+        date.setSeconds(seconds);
+        return date.toISOString().substr(11, 8);
       }
         
 			var degreeSymbol = String.fromCharCode(176);
@@ -241,6 +252,10 @@
 			</script>
 		</div>
 		<script>
+    function updateRunTimeFields(runTime, idleTime) {
+      $("#runTimeField").text(secondsToHHMMSS(runTime));
+      $("#idleTimeField").text(secondsToHHMMSS(Math.round(idleTime)));
+    }
 		function updateCabinTempHumidity(temp, humidity) {
 			$("#cabinTempField").text(temp);
 			$("#cabinHumidityField").text(humidity);
@@ -257,8 +272,14 @@
 			var speed = parseInt(carData["speed"]);
 			var rpm = parseInt(carData["rpm"]);
 			var throttle = parseInt(carData["throttle"]);
-			var cabinTemp;
+      
+			var runTime = parseInt(carData["runTime"]);
+      var idleTime = parseInt(carData["idleTime"]); //approximation based on update interval defined in obdDash.py
+      console.log(idleTime);
+      
 			$("#throttleField").text(throttle);
+      
+      updateRunTimeFields(runTime, idleTime);
 			updateSpeedChart(speed, currentTime);
 			updateRpmChart(rpm, currentTime);
 		});
