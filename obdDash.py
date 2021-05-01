@@ -14,6 +14,7 @@ delay = 0.3 #Delay in seconds before sending data
 
 idleTime = 0.0 #Time the engine is idling in seconds
 maxIdleRpm = 1000 #rpm threshold that helps define if engine is idling
+maxThrottleActuatorIdle = 2.5
 
 currentDtcCodes = []
 dtcCodesChanged = False
@@ -31,6 +32,7 @@ sio = socketio.Client()
 sio.connect('http://localhost:3000')
 
 def emitBaseTelemetry():
+    global idleTime
 
     speedCmd = obd.commands.SPEED # select an OBD command (sensor)
     response = connection.query(speedCmd) # send the command, and parse the response
@@ -46,15 +48,17 @@ def emitBaseTelemetry():
     
     runTimeCmd = obd.commands.RUN_TIME
     response = connection.query(runTimeCmd)
-    runTime = str(response.value.magnitude)
+    runTime = str(response.value)
     
-    pedalPosCmd = obd.commands.ACCELERATOR_POS #percent of pedal being pushed down. 
-    response = connection.query(pedalPosCmd)
-    pedalPos = str(response.value.magnitude)
+    throttleActuatorCmd = obd.commands.THROTTLE_ACTUATOR # less than 2.5% at idle
+    response = connection.query(throttleActuatorCmd)
+    throttleActuator = response.value.magnitude
     
-    idleTime = (idleTime + delay) if rpm <= maxIdleRpm else idleTime #this will have one decimal place. Parse on front end
+    if (rpm <= maxIdleRpm and throttleActuator < maxThrottleActuatorIdle):
+        idleTime += delay
+    #idleTime = (idleTime + delay) if rpm <= maxIdleRpm else idleTime #this will have one decimal place. Parse on front end
     
-    data = {'speed': speed, 'rpm': rpm, 'throttle': throttle, 'runtime': runtime, 'idleTime': idleTime}
+    data = {'speed': speed, 'rpm': rpm, 'throttle': throttle, 'runTime': runTime, 'idleTime': idleTime}
     sio.emit('data', json.dumps(data))
 
 def emitDtcCodes():
