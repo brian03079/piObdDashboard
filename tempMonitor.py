@@ -6,7 +6,7 @@ import json
 
 METRIC_UNITS = False
 
-dhtSensor = adafruit_dht.DHT22(board.D4, use_pulseio=False)
+dhtSensor = adafruit_dht.DHT22(board.D23, use_pulseio=False)
 
 sio = socketio.Client()
 sio.connect('http://localhost:3000')
