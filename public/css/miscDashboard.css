@@ -1,0 +1,45 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: black !important;
+  color: #00ba00 !important;
+  padding-bottom: .5rem;
+  padding-top: .5rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.divider {
+  width: 50%;
+  height: 50%;
+  float: left;
+}
+
+.divider-small {
+  width: 33%;
+  height: 50%;
+  float: left;
+}
+
+.divider-wide {
+  width: 67%;
+  height: 50%;
+  float: left;
+}
+
+#div1 {
+  background: #DDD;
+}
+
+#div2 {
+  background: #AAA;
+}
+
+#div3 {
+  background: #777;
+}
+
+#div4 {
+  background: #444;
+}

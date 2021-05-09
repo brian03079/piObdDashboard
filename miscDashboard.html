@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+    <body id="dashboardBody">
+        <script src="/js/jquery.min.js"></script>
+        <script src="/js/plotly-latest.min.js"></script>
+        <script src="/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css" />
+        <link rel="stylesheet" type="text/css" href="/css/bootstrap-theme.min.css" />
+        <link rel="stylesheet" type="text/css" href="/css/miscDashboard.css" />
+        <script src="/js/socket.io.min.js"></script>
+        <div id="gpsDiv" class="divider">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm">
+                        <h4>
+                        GPS</h1>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm">Status:</div>
+                    <div class="col-sm">Offline</div>
+                    <div class="col-sm"></div>
+                    <div class="col-sm"></div>
+                </div>
+                <div class="row">
+                    <div class="col-sm">Time:</div>
+                    <div class="col-sm">--</div>
+                    <div class="col-sm">+/-</div>
+                    <div class="col-sm">--</div>
+                </div>
+                <div class="row">
+                    <div class="col-sm">Latitude:</div>
+                    <div class="col-sm">--</div>
+                    <div class="col-sm">+/-</div>
+                    <div class="col-sm">--</div>
+                </div>
+                <div class="row">
+                    <div class="col-sm">Longitude:</div>
+                    <div class="col-sm">--</div>
+                    <div class="col-sm">+/-</div>
+                    <div class="col-sm">--</div>
+                </div>
+                <div class="row">
+                    <div class="col-sm">Altitude:</div>
+                    <div class="col-sm">--</div>
+                    <div class="col-sm">+/-</div>
+                    <div class="col-sm">--</div>
+                </div>
+                <div class="row">
+                    <div class="col-sm">Speed:</div>
+                    <div class="col-sm">--</div>
+                    <div class="col-sm">+/-</div>
+                    <div class="col-sm">--</div>
+                </div>
+                <div class="row">
+                    <div class="col-sm">Heading:</div>
+                    <div class="col-sm">--</div>
+                    <div class="col-sm"></div>
+                    <div class="col-sm">--</div>
+                </div>
+                <div class="row">
+                    <div class="col-sm">Climb:</div>
+                    <div class="col-sm">--</div>
+                    <div class="col-sm"></div>
+                    <div class="col-sm"></div>
+                </div>
+                <div class="row">
+                    <div class="col-sm">Grid Square:</div>
+                    <div class="col-sm"></div>
+                    <div class="col-sm"></div>
+                    <div class="col-sm"></div>
+                </div>
+            </div>
+        </div>
+        <div id="GyroPitchDiv" class="divider">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm">
+                        <h4>Pitch &deg;</h4>
+                    </div>
+                    <div class="col-sm">
+                        <h4>--</h4>
+                    </div>
+                    <div class="col-sm"></div>
+                    <div class="col-sm"></div>
+                    <div class="col-sm"></div>
+                </div>
+                <div id="pitchGraph"></div>
+            </div>
+        </div>
+        <div id="airQualityDiv" class="divider">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm">
+                        <h4>Air Quality</h4>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm">Status:</div>
+                    <div class="col-sm">Offline</div>
+                    <div class="col-sm"></div>
+                </div>
+                <div class="row">
+                    <div class="col-sm">PM 1.0:</div>
+                    <div class="col-sm">--</div>
+                    <div class="col-sm">PM 2.5:</div>
+                    <div class="col-sm">--</div>
+                    <div class="col-sm">PM 10:</div>
+                    <div class="col-sm">--</div>
+                </div>
+                <div class="row">
+                    <div class="col-sm">PM > .3um / 0.1L air:</div>
+                    <div class="col-sm">--</div>
+                </div>
+                <div class="row">
+                    <div class="col-sm">PM > .5um / 0.1L air:</div>
+                    <div class="col-sm">--</div>
+                </div>
+                <div class="row">
+                    <div class="col-sm">PM > 1.0um / 0.1L air:</div>
+                    <div class="col-sm">--</div>
+                </div>
+                <div class="row">
+                    <div class="col-sm">PM > 2.5um / 0.1L air:</div>
+                    <div class="col-sm">--</div>
+                </div>
+                <div class="row">
+                    <div class="col-sm">PM > 5.0um / 0.1L air:</div>
+                    <div class="col-sm">--</div>
+                </div>
+                <div class="row">
+                    <div class="col-sm">PM > 10um / 0.1L air:</div>
+                    <div class="col-sm">--</div>
+                </div>
+            </div>
+        </div>
+        <div id="gyroRollDiv" class="divider">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm">
+                        <h4>Roll &deg;</h4>
+                    </div>
+                    <div class="col-sm">
+                        <h4>--</h4>
+                    </div>
+                    <div class="col-sm"></div>
+                    <div class="col-sm"></div>
+                    <div class="col-sm"></div>
+                </div>
+                <div id="rollGraph"></div>
+            </div>
+        </div>
+    </body>
+</html>
+<script>
+    var x_max = 4; //max number of data points per plot
+
+    var fontSize = 20;
+    var defaultColor = '#00ba00';
+    var plotBackgroundColor = '#000000';
+    var plotHeight = 250;
+    var plotWidth = 250;
+    var plotLeftMargin = 0;
+    var plotRightMargin = 0;
+    var plotBottomMargin = 0;
+    var plotTopMargin = 0;
+    var padding = 1; //spacing between graph and labels
+    var numXTicks = 5; //max number of x labels per graph
+    var tickAngle = 0;
+    var lineWidth = 1;
+
+    var config = {
+        responsive: true
+    }
+
+    var gpsPitchLayout = {
+        autosize: true,
+        height: plotHeight,
+        width: plotWidth,
+        margin: {
+            l: plotLeftMargin,
+            r: plotRightMargin,
+            b: plotBottomMargin,
+            t: plotTopMargin,
+            pad: padding
+        },
+        xaxis: {
+                tickangle: tickAngle,
+            nticks: numXTicks,
+            gridcolor: defaultColor
+        },
+        yaxis: {
+                gridcolor: defaultColor
+        },
+        font: {
+            size: fontSize,
+            color: defaultColor
+        },
+        paper_bgcolor: plotBackgroundColor,
+        plot_bgcolor: plotBackgroundColor
+    };
+
+    Plotly.react('pitchGraph', [{
+        x: [0],
+        y: [0],
+        type: 'line',
+        line: {
+            color: defaultColor,
+            width: lineWidth
+        },
+    }], gpsPitchLayout, config);
+
+    function updatePitchGraph(angle) {
+
+
+
+        var speedTrace = {
+            x: [
+                [time]
+            ],
+            y: [
+                [speed]
+            ]
+        }
+        Plotly.extendTraces('pitchGraph', speedTrace, [0], x_max);
+    }
+
+
+    var config = {
+        responsive: true
+    }
+
+    var gpsRollLayout = {
+        autosize: true,
+        height: plotHeight,
+        width: plotWidth,
+        margin: {
+            l: plotLeftMargin,
+            r: plotRightMargin,
+            b: plotBottomMargin,
+            t: plotTopMargin,
+            pad: padding
+        },
+        xaxis: {
+                tickangle: tickAngle,
+            nticks: numXTicks,
+            gridcolor: defaultColor
+        },
+        yaxis: {
+                gridcolor: defaultColor
+        },
+        font: {
+            size: fontSize,
+            color: defaultColor
+        },
+        paper_bgcolor: plotBackgroundColor,
+        plot_bgcolor: plotBackgroundColor
+    };
+
+    Plotly.react('rollGraph', [{
+        x: [0],
+        y: [0],
+        type: 'line',
+        line: {
+            color: defaultColor,
+            width: lineWidth
+        },
+    }], gpsRollLayout, config);
+
+    function updatePitchGraph(angle) {
+
+
+
+        var speedTrace = {
+            x: [
+                [time]
+            ],
+            y: [
+                [speed]
+            ]
+        }
+        Plotly.extendTraces('rollGraph', speedTrace, [0], x_max);
+    }
+
+    var socket = io();
+    if (socket != null) {
+        $("#statusField").text = "Connected";
+    }
+
+    socket.on("gpsData", function(msg) {
+
+        updateGpsGraphs(runTime, idleTime);
+        updatePitchGraph(pitchAngle);
+        updateRollGraph(rollAngle);
+    });
+</script>
