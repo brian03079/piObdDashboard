@@ -10,6 +10,14 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
+.bold {
+  font-weight: bold;
+}
+
+.border-color {
+  border-color: #00ba00 !important;
+}
+
 .pad-left {
 	margin-left: 15px;
 }
