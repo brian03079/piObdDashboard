@@ -17,12 +17,6 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-sm">Status:</div>
-                    <div class="col-sm">Offline</div>
-                    <div class="col-sm"></div>
-                    <div class="col-sm"></div>
-                </div>
-                <div class="row">
                     <div class="col-sm">Time:</div>
                     <div class="col-sm">--</div>
                     <div class="col-sm">+/-</div>
@@ -73,6 +67,7 @@
             </div>
         </div>
         <div id="GyroPitchDiv" class="divider">
+
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-sm">
@@ -82,10 +77,17 @@
                         <h4>--</h4>
                     </div>
                     <div class="col-sm"></div>
-                    <div class="col-sm"></div>
-                    <div class="col-sm"></div>
+                    <div class="col-sm"><h4>Roll &deg;</h4></div>
+                    <div class="col-sm">--</div>
                 </div>
-                <div id="pitchGraph"></div>
+                <div class="row">
+                    <div class="col-sm">
+                        <div id="pitchGraph"></div>
+                    </div>
+                    <div class="col-sm">
+                        <div id="rollGraph"></div>
+                    </div>
+                </div>
             </div>
         </div>
         <div id="airQualityDiv" class="divider">
@@ -96,70 +98,76 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-sm">Status:</div>
-                    <div class="col-sm">Offline</div>
-                    <div class="col-sm"></div>
+                    <div class="col-sm" id="pm10Header">PM 1.0:</div>
+                    <div class="col-sm" id="pm10Field">--</div>
+                    <div class="col-sm" id="pm25Header">PM 2.5:</div>
+                    <div class="col-sm" id="pm25Field">--</div>
+                    <div class="col-sm" id="pm100Header">PM 10:</div>
+                    <div class="col-sm" id="pm100Field">--</div>
                 </div>
                 <div class="row">
-                    <div class="col-sm">PM 1.0:</div>
-                    <div class="col-sm">--</div>
-                    <div class="col-sm">PM 2.5:</div>
-                    <div class="col-sm">--</div>
-                    <div class="col-sm">PM 10:</div>
-                    <div class="col-sm">--</div>
+                    <div class="col-sm" id="pm3umHeader">PM > .3um / 0.1L air:</div>
+                    <div class="col-sm" id="pm3umField">--</div>
                 </div>
                 <div class="row">
-                    <div class="col-sm">PM > .3um / 0.1L air:</div>
-                    <div class="col-sm">--</div>
+                    <div class="col-sm" id="pm5umHeader">PM > .5um / 0.1L air:</div>
+                    <div class="col-sm" id="pm5umField">--</div>
                 </div>
                 <div class="row">
-                    <div class="col-sm">PM > .5um / 0.1L air:</div>
-                    <div class="col-sm">--</div>
+                    <div class="col-sm" id="pm10umHeader">PM > 1.0um / 0.1L air:</div>
+                    <div class="col-sm" id="pm10umField">--</div>
                 </div>
                 <div class="row">
-                    <div class="col-sm">PM > 1.0um / 0.1L air:</div>
-                    <div class="col-sm">--</div>
+                    <div class="col-sm" id="pm25umHeader">PM > 2.5um / 0.1L air:</div>
+                    <div class="col-sm" id="pm25umField">--</div>
                 </div>
                 <div class="row">
-                    <div class="col-sm">PM > 2.5um / 0.1L air:</div>
-                    <div class="col-sm">--</div>
+                    <div class="col-sm" id="pm50umHeader">PM > 5.0um / 0.1L air:</div>
+                    <div class="col-sm" id="pm50umField">--</div>
                 </div>
                 <div class="row">
-                    <div class="col-sm">PM > 5.0um / 0.1L air:</div>
-                    <div class="col-sm">--</div>
+                    <div class="col-sm" id="pm100umHeader">PM > 10um / 0.1L air:</div>
+                    <div class="col-sm" id="pm100umField">--</div>
                 </div>
                 <div class="row">
-                    <div class="col-sm">PM > 10um / 0.1L air:</div>
-                    <div class="col-sm">--</div>
+                    <div class="col-sm" id="airQualityErrorHeader">Read Errors:</div>
+                    <div class="col-sm" id="airQualityErrorField">0</div>
                 </div>
             </div>
         </div>
-        <div id="gyroRollDiv" class="divider">
+        <div id="miscDataDiv" class="divider">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-sm">
-                        <h4>Roll &deg;</h4>
+                        <h4>Misc</h4>
                     </div>
-                    <div class="col-sm">
-                        <h4>--</h4>
-                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm" id="cpuTempHeader">CPU Temp(&deg;F):</div>
+                    <div class="col-sm" id="cpuTempField">--</div>
                     <div class="col-sm"></div>
+                </div>
+                <div class="row">
+                    <div class="col-sm" id="cpuTempHeader">Logs:</div>
                     <div class="col-sm"></div>
                     <div class="col-sm"></div>
                 </div>
-                <div id="rollGraph"></div>
+                <div class="row pad-left">
+                    <div class="col-sm">N/A</div>
+                </div>
             </div>
         </div>
     </body>
 </html>
+
 <script>
     var x_max = 4; //max number of data points per plot
 
     var fontSize = 20;
     var defaultColor = '#00ba00';
     var plotBackgroundColor = '#000000';
-    var plotHeight = 250;
-    var plotWidth = 250;
+    var plotHeight = 220;
+    var plotWidth = 220;
     var plotLeftMargin = 0;
     var plotRightMargin = 0;
     var plotBottomMargin = 0;
@@ -185,12 +193,14 @@
             pad: padding
         },
         xaxis: {
-                tickangle: tickAngle,
+            tickangle: tickAngle,
             nticks: numXTicks,
-            gridcolor: defaultColor
+            color: defaultColor,
+            showgrid: false
         },
         yaxis: {
-                gridcolor: defaultColor
+            color: defaultColor,
+            showgrid: false
         },
         font: {
             size: fontSize,
@@ -242,12 +252,14 @@
             pad: padding
         },
         xaxis: {
-                tickangle: tickAngle,
+            tickangle: tickAngle,
             nticks: numXTicks,
-            gridcolor: defaultColor
+            color: defaultColor,
+            showgrid: false
         },
         yaxis: {
-                gridcolor: defaultColor
+            color: defaultColor,
+            showgrid: false
         },
         font: {
             size: fontSize,
@@ -286,11 +298,38 @@
     if (socket != null) {
         $("#statusField").text = "Connected";
     }
+    
+    socket.on("airQualityData", function(msg) {
+        updateAirQualityStats(msg);
+    });
+    
+    socket.on("airQualityError", function(msg) {
+        updateAirQualityError(msg);
+    });
 
     socket.on("gpsData", function(msg) {
-
-        updateGpsGraphs(runTime, idleTime);
         updatePitchGraph(pitchAngle);
         updateRollGraph(rollAngle);
     });
+</script>
+
+<script>
+    function updateAirQualityStats(msg) {
+        var data = $.parseJSON(msg);
+        $("#pm10Field").text(data["pm10"]);
+        $("#pm25Field").text(data["pm25"]);
+        $("#pm100Field").text(data["pm100"]);
+        $("#pm3umField").text(data["pm3um"]);
+        $("#pm5umField").text(data["pm5um"]);
+        $("#pm10umField").text(data["pm10um"]);
+        $("#pm25umField").text(data["pm25um"]);
+        $("#pm50umField").text(data["pm50um"]);
+        $("#pm100umField").text(data["pm100um"]);   
+    }
+    
+    function updateAirQualityError(msg) {
+        var numErrors = parseInt(msg);
+        $("#airQualityErrorField").text(
+            parseInt($("#airQualityErrorField").text) + numErrors);
+    }
 </script>

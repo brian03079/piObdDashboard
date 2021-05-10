@@ -37,6 +37,16 @@ io.on('connection', (socket) => {
   socket.on('sensorDumpRequest', msg => {
     io.emit('sensorDumpRequest', msg);
   });
+  
+  socket.on('gpsData', msg => {
+    io.emit('gpsData', msg);
+  });
+  socket.on('airQualityData', msg => {
+    io.emit('airQualityData', msg);
+  });
+  socket.on('airQualityError', msg => {
+    io.emit('airQualityError', msg);
+  });
 });
 
 http.listen(port, () => {
