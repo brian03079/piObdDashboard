@@ -23,9 +23,12 @@ Required hardware:
 7. Power cable for the pi
 8. Way to power the pi (ie. power bank, cigarette to usb car plug adapter)
 
-Optional hardware:
-1. (Optional) DHT22/11 temp and humidity sensor [Link](https://www.amazon.com/gp/product/B073F472JL/ref=ppx_yo_dt_b_search_asin_image?ie=UTF8&psc=1)
+Optional hardware (TODO: tutorial for parts 3 - 5):
+1. DHT22/11 temp and humidity sensor [Link](https://www.amazon.com/gp/product/B073F472JL/ref=ppx_yo_dt_b_search_asin_image?ie=UTF8&psc=1)
 2. PiJuice HAT uninterruptible power supply [Link](https://www.sparkfun.com/products/14803) - This will prevent hard shutdowns on the pi when the car is turned off. I am also tweaking start/shutdown scripts to automate everything. 
+3. Adafruit PMSA003I Air Quality Breakout [Link](https://www.adafruit.com/product/4632) - Displays air quality measurements on misc dashboard
+4. Adafruit Ultimate GPS HAT [Link](https://www.adafruit.com/product/2324) - Display GPS information on misc dashboard
+5. Adafruit 9-DOF Absolute Orientation IMU Fusion Breakout - BNO055 [Link](https://www.adafruit.com/product/2472) - Display pitch, roll, etc. of car on misc dashboard
 
 Dependencies:
 1. nodejs
@@ -36,6 +39,8 @@ Dependencies:
 6. python3
 7. express >= 4
 8. adafruit_dht (if you are using the DHT22/11 sensors)
+9. python gps (for getting data from gpsd inside python)
+10. Adafruit-Blinka, adafruit-circuitpython-pm25 (for air quality sensor)
 
 How to run:
 1. Make sure your car is on with the engine running
