@@ -40,6 +40,10 @@ body {
   float: left;
 }
 
+.hidden {
+  display: none;
+}
+
 #div1 {
   background: #DDD;
 }

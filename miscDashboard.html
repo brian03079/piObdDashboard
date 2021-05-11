@@ -17,47 +17,45 @@
                 </div>
                 <div class="row">
                     <div class="col-sm">Time:</div>
-                    <div class="col-sm">--</div>
-                    <div class="col-sm">+/-</div>
-                    <div class="col-sm">--</div>
+                    <div class="col-sm" id="timeField">--</div>
                 </div>
                 <div class="row">
                     <div class="col-sm">Latitude:</div>
-                    <div class="col-sm">--</div>
+                    <div class="col-sm" id="latitudeField">--</div>
                     <div class="col-sm">+/-</div>
-                    <div class="col-sm">--</div>
+                    <div class="col-sm" id="latitudeErrField">--</div>
                 </div>
                 <div class="row">
                     <div class="col-sm">Longitude:</div>
-                    <div class="col-sm">--</div>
+                    <div class="col-sm" id="longitudeField">--</div>
                     <div class="col-sm">+/-</div>
-                    <div class="col-sm">--</div>
+                    <div class="col-sm" id="longitudeErrField">--</div>
                 </div>
                 <div class="row">
                     <div class="col-sm">Altitude(ft):</div>
-                    <div class="col-sm">--</div>
+                    <div class="col-sm" id="altitudeField">--</div>
                     <div class="col-sm">+/-</div>
-                    <div class="col-sm">--</div>
+                    <div class="col-sm" id="altitudeErrField">--</div>
                 </div>
                 <div class="row">
                     <div class="col-sm">Speed(mph):</div>
-                    <div class="col-sm">--</div>
+                    <div class="col-sm" id="speedField">--</div>
                     <div class="col-sm">+/-</div>
-                    <div class="col-sm">--</div>
-                </div>
-                <div class="row">
-                    <div class="col-sm">Heading&deg;:</div>
-                    <div class="col-sm">--</div>
-                    <div class="col-sm"></div>
-                    <div class="col-sm"></div>
+                    <div class="col-sm" id="speedErrField">--</div>
                 </div>
                 <div class="row">
                     <div class="col-sm">Climb(ft/min):</div>
-                    <div class="col-sm">--</div>
+                    <div class="col-sm" id="climbField">--</div>
+                    <div class="col-sm">+/-</div>
+                    <div class="col-sm" id="climbErrField">--</div>
+                </div>
+                <div class="row">
+                    <div class="col-sm">Heading&deg;:</div>
+                    <div class="col-sm" id="headingField">--</div>
                     <div class="col-sm"></div>
                     <div class="col-sm"></div>
                 </div>
-                <div class="row">
+                <div class="row hidden">
                     <div class="col-sm">Grid Square:</div>
                     <div class="col-sm"></div>
                     <div class="col-sm"></div>
@@ -307,6 +305,10 @@
     });
 
     socket.on("gpsData", function(msg) {
+        updateGpsStats(msg);
+    });
+    
+    socket.on("orientationData", function(msg) {
         updatePitchGraph(pitchAngle);
         updateRollGraph(rollAngle);
     });
@@ -330,5 +332,22 @@
         var numErrors = parseInt(msg);
         $("#airQualityErrorField").text(
             parseInt($("#airQualityErrorField").text) + numErrors);
+    }
+    
+    function updateGpsStats(msg) {
+        var data = $.parseJSON(msg);
+        $("#timeField").text(data["time"]);
+        //$("#timeErrField").text(data["timeErr"]);
+        $("#latitudeField").text(data["latitude"]);
+        $("#latitudeErrField").text(data["latitudeErr"]);
+        $("#longitudeField").text(data["longitude"]);
+        $("#longitudeErrField").text(data["longitudeErr"]);
+        $("#altitudeField").text(data["altitude"]);
+        $("#altitudeErrField").text(data["altitudeErr"]);
+        $("#speedField").text(data["speed"]);
+        $("#speedErrField").text(data["speedErr"]);
+        $("#climbField").text(data["climb"]);
+        $("#climbErrField").text(data["climbErr"]);
+        //$("#headingField").text(data["heading"]);
     }
 </script>
