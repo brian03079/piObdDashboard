@@ -6,8 +6,8 @@ from gps import *
 
 #see https://gpsd.gitlab.io/gpsd/gpsd_json.html for more details on getting data from gpsd
 
+SENSOR_TYPE = 'GPS'
 delay = 1 #gps polling interval in seconds. Max polling rate 10hz for Adafruit Ultimate GPS (MTK3339 chipset)
-    
 gpsd = gps(mode=WATCH_ENABLE|WATCH_NEWSTYLE) 
 
 sio = socketio.Client()
@@ -42,14 +42,21 @@ def emitGpsData():
                     
                 sio.emit('gpsData', json.dumps(data))
                 
-        except Exception:
+        except Exception as ex:
             print("Unable to read from gps sensor, retrying...")
+            
             now = datetime.datetime.now()
             timestamp = "%d-%d-%d_%d_%d_%d" % (now.year, now.month, now.day, now.hour, now.minute, now.second)
+
+            template = "Exception: {0} occurred. Args:{1!r}"
+            errorDesc = template.format(type(ex).__name__, ex.args)
+            
             error = {
-                'description': 'GPS read error',
+                'sensor' : SENSOR_TYPE,
+                'description': errorDesc,
                 'timeStamp': timestamp
             }
+            print(error)
             sio.emit('error', error)
             continue
 
