@@ -11,49 +11,46 @@
         <div id="gpsDiv" class="divider">
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-sm">
+                    <div class="col col-sm-3">
                         <h4 class="bold">GPS</h4>
                     </div>
+                    <div class="col col-sm-7" id="timeField">--</div>
                 </div>
                 <div class="row">
-                    <div class="col-sm">Time:</div>
-                    <div class="col-sm" id="timeField">--</div>
+                    <div class="col col-sm-3">Latitude:</div>
+                    <div class="col col-sm-3" id="latitudeField">--</div>
+                    <div class="col col-sm-2">+/-</div>
+                    <div class="col col-sm-2" id="latitudeErrField">--</div>
                 </div>
                 <div class="row">
-                    <div class="col-sm">Latitude:</div>
-                    <div class="col-sm" id="latitudeField">--</div>
-                    <div class="col-sm">+/-</div>
-                    <div class="col-sm" id="latitudeErrField">--</div>
+                    <div class="col col-sm-3">Longitude:</div>
+                    <div class="col col-sm-3" id="longitudeField">--</div>
+                    <div class="col col-sm-2">+/-</div>
+                    <div class="col col-sm-2" id="longitudeErrField">--</div>
                 </div>
                 <div class="row">
-                    <div class="col-sm">Longitude:</div>
-                    <div class="col-sm" id="longitudeField">--</div>
-                    <div class="col-sm">+/-</div>
-                    <div class="col-sm" id="longitudeErrField">--</div>
+                    <div class="col col-sm-3">Altitude(ft):</div>
+                    <div class="col col-sm-3" id="altitudeField">--</div>
+                    <div class="col col-sm-2">+/-</div>
+                    <div class="col col-sm-2" id="altitudeErrField">--</div>
                 </div>
                 <div class="row">
-                    <div class="col-sm">Altitude(ft):</div>
-                    <div class="col-sm" id="altitudeField">--</div>
-                    <div class="col-sm">+/-</div>
-                    <div class="col-sm" id="altitudeErrField">--</div>
+                    <div class="col col-sm-3">Speed(mph):</div>
+                    <div class="col col-sm-3" id="speedField">--</div>
+                    <div class="col col-sm-2">+/-</div>
+                    <div class="col col-sm-2" id="speedErrField">--</div>
                 </div>
                 <div class="row">
-                    <div class="col-sm">Speed(mph):</div>
-                    <div class="col-sm" id="speedField">--</div>
-                    <div class="col-sm">+/-</div>
-                    <div class="col-sm" id="speedErrField">--</div>
+                    <div class="col col-sm-3">Climb(ft/min):</div>
+                    <div class="col col-sm-3" id="climbField">--</div>
+                    <div class="col col-sm-2">+/-</div>
+                    <div class="col col-sm-2" id="climbErrField">--</div>
                 </div>
                 <div class="row">
-                    <div class="col-sm">Climb(ft/min):</div>
-                    <div class="col-sm" id="climbField">--</div>
-                    <div class="col-sm">+/-</div>
-                    <div class="col-sm" id="climbErrField">--</div>
-                </div>
-                <div class="row">
-                    <div class="col-sm">Heading&deg;:</div>
-                    <div class="col-sm" id="headingField">--</div>
-                    <div class="col-sm"></div>
-                    <div class="col-sm"></div>
+                    <div class="col col-sm-3">Heading&deg;:</div>
+                    <div class="col col-sm-3" id="headingField">--</div>
+                    <div class="col col-sm-2"></div>
+                    <div class="col col-sm-2"></div>
                 </div>
                 <div class="row hidden">
                     <div class="col-sm">Grid Square:</div>
@@ -67,14 +64,15 @@
 
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-sm">
-                        <h4  class="bold">Pitch&deg;</h4>
+                    <div class="col col-sm-3">
+                        <h4 class="bold">Pitch&deg;</h4>
                     </div>
                     <div class="col-sm">
                         <h4>--</h4>
                     </div>
-                    <div class="col-sm"></div>
-                    <div class="col-sm"><h4 class="bold">Roll&deg;</h4></div>
+                    <div class="col col-sm-3">
+                        <h4 class="bold">Roll&deg;</h4>
+                    </div>
                     <div class="col-sm">--</div>
                 </div>
                 <div class="row">
@@ -90,45 +88,48 @@
         <div id="airQualityDiv" class="divider">
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-sm">
+                    <div class="col col-sm-4">
                         <h4 class="bold">Air Quality</h4>
+                    </div>
+                    <div class="col col-sm-7 borderGreen">
+                        <div class="tab" id="airQualityBar">-</div>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-sm" id="pm10Header">PM 1.0:</div>
-                    <div class="col-sm" id="pm10Field">--</div>
-                    <div class="col-sm" id="pm25Header">PM 2.5:</div>
-                    <div class="col-sm" id="pm25Field">--</div>
-                    <div class="col-sm" id="pm100Header">PM 10:</div>
-                    <div class="col-sm" id="pm100Field">--</div>
+                    <div class="col col-sm-2" id="pm10Header">PM1.0:</div>
+                    <div class="col col-sm-2" id="pm10Field">--</div>
+                    <div class="col col-sm-2" id="pm25Header">PM2.5:</div>
+                    <div class="col col-sm-2" id="pm25Field">--</div>
+                    <div class="col col-sm-2" id="pm100Header">PM10:</div>
+                    <div class="col col-sm-2" id="pm100Field">--</div>
                 </div>
                 <div class="row">
-                    <div class="col-sm" id="pm3umHeader">PM > .3um / 0.1L air:</div>
-                    <div class="col-sm" id="pm3umField">--</div>
+                    <div class="col col-sm-6" id="pm3umHeader">PM > .3um / 0.1L air:</div>
+                    <div class="col col-sm-2" id="pm3umField">--</div>
                 </div>
                 <div class="row">
-                    <div class="col-sm" id="pm5umHeader">PM > .5um / 0.1L air:</div>
-                    <div class="col-sm" id="pm5umField">--</div>
+                    <div class="col col-sm-6" id="pm5umHeader">PM > .5um / 0.1L air:</div>
+                    <div class="col col-sm-2" id="pm5umField">--</div>
                 </div>
                 <div class="row">
-                    <div class="col-sm" id="pm10umHeader">PM > 1.0um / 0.1L air:</div>
-                    <div class="col-sm" id="pm10umField">--</div>
+                    <div class="col col-sm-6" id="pm10umHeader">PM > 1.0um / 0.1L air:</div>
+                    <div class="col col-sm-2" id="pm10umField">--</div>
                 </div>
                 <div class="row">
-                    <div class="col-sm" id="pm25umHeader">PM > 2.5um / 0.1L air:</div>
-                    <div class="col-sm" id="pm25umField">--</div>
+                    <div class="col col-sm-6" id="pm25umHeader">PM > 2.5um / 0.1L air:</div>
+                    <div class="col col-sm-2" id="pm25umField">--</div>
                 </div>
                 <div class="row">
-                    <div class="col-sm" id="pm50umHeader">PM > 5.0um / 0.1L air:</div>
-                    <div class="col-sm" id="pm50umField">--</div>
+                    <div class="col col-sm-6" id="pm50umHeader">PM > 5.0um / 0.1L air:</div>
+                    <div class="col col-sm-2" id="pm50umField">--</div>
                 </div>
                 <div class="row">
-                    <div class="col-sm" id="pm100umHeader">PM > 10um / 0.1L air:</div>
-                    <div class="col-sm" id="pm100umField">--</div>
+                    <div class="col col-sm-6" id="pm100umHeader">PM > 10um / 0.1L air:</div>
+                    <div class="col col-sm-2" id="pm100umField">--</div>
                 </div>
-                <div class="row">
-                    <div class="col-sm" id="airQualityErrorHeader">Read Errors:</div>
-                    <div class="col-sm" id="airQualityErrorField">0</div>
+                <div class="row hidden">
+                    <div class="col col-sm-6" id="airQualityErrorHeader">Read Errors:</div>
+                    <div class="col col-sm-2" id="airQualityErrorField">0</div>
                 </div>
             </div>
         </div>
@@ -145,7 +146,7 @@
                     <div class="col-sm"></div>
                 </div>
                 <div class="row">
-                    <div class="col-sm" id="cpuTempHeader">Logs:</div>
+                    <div class="col-sm" id="logsHeader">Logs:</div>
                     <div class="col-sm"></div>
                     <div class="col-sm"></div>
                 </div>
@@ -158,6 +159,7 @@
 </html>
 
 <script>
+    $("#airQualityBar").width('100%');
     var x_max = 4; //max number of data points per plot
 
     var fontSize = 20;
@@ -300,8 +302,8 @@
         updateAirQualityStats(msg);
     });
     
-    socket.on("airQualityError", function(msg) {
-        updateAirQualityError(msg);
+    socket.on("log", function(msg) {
+        updateLogs(msg);
     });
 
     socket.on("gpsData", function(msg) {
