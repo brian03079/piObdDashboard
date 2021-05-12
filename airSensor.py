@@ -102,7 +102,7 @@ def emitAirSensorData():
         except Exception as ex:
             errorLog = createLogMessage(ex, ERROR, SENSOR_TYPE)
             print(errorLog)
-            sio.emit('error', errorLog)
+            sio.emit('log', errorLog)
             continue
 
 
