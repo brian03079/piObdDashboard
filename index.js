@@ -44,8 +44,8 @@ io.on('connection', (socket) => {
   socket.on('airQualityData', msg => {
     io.emit('airQualityData', msg);
   });
-  socket.on('error', msg => {
-    io.emit('error', msg);
+  socket.on('log', msg => {
+    io.emit('log', msg);
   });
 });
 
