@@ -11,47 +11,44 @@
         <div id="gpsDiv" class="divider">
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col col-sm-3">
+                    <div class="col col-sm-2">
                         <h4 class="bold">GPS</h4>
                     </div>
-                    <div class="col col-sm-7" id="timeField">--</div>
+                    <div class="col col-sm-2" id="fixField">--</div>
+                    <div class="col col-sm-8 subheading" id="timeField">--</div>
                 </div>
                 <div class="row">
-                    <div class="col col-sm-3">Fix:</div>
-                    <div class="col col-sm-3" id="fixField">--</div>
-                </div>
-                <div class="row">
-                    <div class="col col-sm-3">Latitude:</div>
+                    <div class="col col-sm-4">Latitude:</div>
                     <div class="col col-sm-3" id="latitudeField">--</div>
                     <div class="col col-sm-2">+/-</div>
                     <div class="col col-sm-2" id="latitudeErrField">--</div>
                 </div>
                 <div class="row">
-                    <div class="col col-sm-3">Longitude:</div>
+                    <div class="col col-sm-4">Longitude:</div>
                     <div class="col col-sm-3" id="longitudeField">--</div>
                     <div class="col col-sm-2">+/-</div>
                     <div class="col col-sm-2" id="longitudeErrField">--</div>
                 </div>
                 <div class="row">
-                    <div class="col col-sm-3">Altitude(m):</div>
+                    <div class="col col-sm-4">Altitude(m):</div>
                     <div class="col col-sm-3" id="altitudeField">--</div>
                     <div class="col col-sm-2">+/-</div>
                     <div class="col col-sm-2" id="altitudeErrField">--</div>
                 </div>
                 <div class="row">
-                    <div class="col col-sm-3">Speed(mph):</div>
+                    <div class="col col-sm-4">Speed(mph):</div>
                     <div class="col col-sm-3" id="speedField">--</div>
                     <div class="col col-sm-2">+/-</div>
                     <div class="col col-sm-2" id="speedErrField">--</div>
                 </div>
                 <div class="row">
-                    <div class="col col-sm-3">Climb(m/s):</div>
+                    <div class="col col-sm-4">Climb(m/s):</div>
                     <div class="col col-sm-3" id="climbField">--</div>
                     <div class="col col-sm-2">+/-</div>
                     <div class="col col-sm-2" id="climbErrField">--</div>
                 </div>
                 <div class="row">
-                    <div class="col col-sm-3">Heading&deg;:</div>
+                    <div class="col col-sm-4">Heading&deg;:</div>
                     <div class="col col-sm-3" id="headingField">--</div>
                     <div class="col col-sm-2"></div>
                     <div class="col col-sm-2"></div>
@@ -92,7 +89,7 @@
         <div id="airQualityDiv" class="divider">
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col col-sm-4">
+                    <div class="col col-sm-6">
                         <h4 class="bold">Air Quality</h4>
                     </div>
                 </div>
@@ -150,14 +147,14 @@
         <div id="miscDataDiv" class="divider">
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-sm">
-                        <h4 class="bold">Misc</h4>
-                    </div>
+                    <div class="col-sm">Accel:</div>
+                    <div class="col-sm">--</div>
+                    <div class="col-sm">Gs:</div>
+                    <div class="col-sm">--</div>
                 </div>
                 <div class="row">
-                    <div class="col-sm" id="cpuTempHeader">CPU Temp(&deg;F):</div>
-                    <div class="col-sm" id="cpuTempField">--</div>
-                    <div class="col-sm"></div>
+                    <div class="col col-sm-6" id="cpuTempHeader">CPU Temp(&deg;F):</div>
+                    <div class="col col-sm-2" id="cpuTempField">--</div>
                 </div>
                 <div class="row">
                     <div class="col col-sm-3" id="logsHeader">Logs:</div>
@@ -359,15 +356,15 @@
         var percent = numParticles * scalar; //percent of bar to remove based on num particles
         
         if (percent >= 100) {
-            bar.width('0%');
+            bar.width('100%');
         } else {
-            bar.width((100 - percent) + '%');
+            bar.width(percent + '%');
         }
         
-        if (percent <= 30) {
+        if (percent <= 70) {
             //barContainer.css({"border-color": GOOD_AIR_COLOR});
             bar.css('background-color', GOOD_AIR_COLOR);
-        } else if (percent > 30 && percent <= 70) {
+        } else if (percent > 70 && percent <= 90) {
             //barContainer.css({"border-color": FAIR_AIR_COLOR});
             bar.css('background-color', FAIR_AIR_COLOR);
         } else {
@@ -401,8 +398,10 @@
     
     function updateGpsStats(msg) {
         var data = $.parseJSON(msg);
-        $("#fixField").text(data["fixType"]);
-        $("#timeField").text(data["time"]);
+        var date = new Date(data["time"]);
+        
+        $("#fixField").text("[" + data["fixType"] + "]");
+        $("#timeField").text(date.toUTCString());
         //$("#timeErrField").text(data["timeErr"]);
         $("#latitudeField").text(data["latitude"]);
         $("#latitudeErrField").text(data["latitudeErr"]);

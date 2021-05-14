@@ -8,13 +8,21 @@ body {
   padding-bottom: .5rem;
   padding-top: .5rem;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  font-size: 110%;
+  font-size: 120%;
+}
+
+.subheading {
+  font-size: 80%;
 }
 
 .table th, .table td, .table row{ 
      border-top: none !important; 
      font-size: 80%;
  }
+ 
+.topBorder {
+  border-top: 2px solid #00ba00;
+}
 
 .logContainer {
   height: 180px;
