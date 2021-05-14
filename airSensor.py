@@ -43,7 +43,7 @@ reset_pin = None
 # from adafruit_pm25.uart import PM25_UART
 # pm25 = PM25_UART(uart, reset_pin)
 SENSOR_TYPE = 'AIR'
-ERROR = 'err'
+ERROR = 'ERR'
 
 DELAY = 1 #sensor polling interval in seconds. Max polling rate 1s for PMSA003I 
 
@@ -71,7 +71,7 @@ while True: #loop until a connection is made with the server instead of immediat
 
 def createLogMessage(ex, logType, sensor):
     now = datetime.datetime.now()
-    timestamp = "%d-%d-%d_%d_%d_%d" % (now.year, now.month, now.day, now.hour, now.minute, now.second)
+    timestamp = "%d:%d:%d" % (now.hour, now.minute, now.second)
             
     return {
         'logType': ERROR,
@@ -102,7 +102,7 @@ def emitAirSensorData():
         except Exception as ex:
             errorLog = createLogMessage(ex, ERROR, SENSOR_TYPE)
             print(errorLog)
-            sio.emit('log', errorLog)
+            sio.emit('log', json.dumps(errorLog))
             continue
 
 

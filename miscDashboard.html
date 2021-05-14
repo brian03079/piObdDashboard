@@ -17,6 +17,10 @@
                     <div class="col col-sm-7" id="timeField">--</div>
                 </div>
                 <div class="row">
+                    <div class="col col-sm-3">Fix:</div>
+                    <div class="col col-sm-3" id="fixField">--</div>
+                </div>
+                <div class="row">
                     <div class="col col-sm-3">Latitude:</div>
                     <div class="col col-sm-3" id="latitudeField">--</div>
                     <div class="col col-sm-2">+/-</div>
@@ -29,7 +33,7 @@
                     <div class="col col-sm-2" id="longitudeErrField">--</div>
                 </div>
                 <div class="row">
-                    <div class="col col-sm-3">Altitude(ft):</div>
+                    <div class="col col-sm-3">Altitude(m):</div>
                     <div class="col col-sm-3" id="altitudeField">--</div>
                     <div class="col col-sm-2">+/-</div>
                     <div class="col col-sm-2" id="altitudeErrField">--</div>
@@ -41,7 +45,7 @@
                     <div class="col col-sm-2" id="speedErrField">--</div>
                 </div>
                 <div class="row">
-                    <div class="col col-sm-3">Climb(ft/min):</div>
+                    <div class="col col-sm-3">Climb(m/s):</div>
                     <div class="col col-sm-3" id="climbField">--</div>
                     <div class="col col-sm-2">+/-</div>
                     <div class="col col-sm-2" id="climbErrField">--</div>
@@ -91,39 +95,49 @@
                     <div class="col col-sm-4">
                         <h4 class="bold">Air Quality</h4>
                     </div>
-                    <div class="col col-sm-7 borderGreen">
-                        <div class="tab" id="airQualityBar">-</div>
-                    </div>
                 </div>
-                <div class="row">
+                <div class="row top-buffer">
                     <div class="col col-sm-2" id="pm10Header">PM1.0:</div>
                     <div class="col col-sm-2" id="pm10Field">--</div>
+                    <div class="col col-sm-7 borderGreen" id="pm10BarContainer">
+                        <div class="bar" id="pm10Bar">-</div>
+                    </div>
+                </div>
+                <div class="row top-buffer">
                     <div class="col col-sm-2" id="pm25Header">PM2.5:</div>
                     <div class="col col-sm-2" id="pm25Field">--</div>
+                    <div class="col col-sm-7 borderGreen" id="pm25BarContainer">
+                        <div class="bar" id="pm25Bar">-</div>
+                    </div>
+                </div>
+                <div class="row top-buffer">
                     <div class="col col-sm-2" id="pm100Header">PM10:</div>
                     <div class="col col-sm-2" id="pm100Field">--</div>
+                    <div class="col col-sm-7 borderGreen" id="pm100BarContainer">
+                        <div class="bar" id="pm100Bar">-</div>
+                    </div>
                 </div>
-                <div class="row">
+                <div class="row hidden">
                     <div class="col col-sm-6" id="pm3umHeader">PM > .3um / 0.1L air:</div>
                     <div class="col col-sm-2" id="pm3umField">--</div>
                 </div>
-                <div class="row">
+                <div class="row hidden">
                     <div class="col col-sm-6" id="pm5umHeader">PM > .5um / 0.1L air:</div>
                     <div class="col col-sm-2" id="pm5umField">--</div>
                 </div>
-                <div class="row">
+                <div class="row hidden">
                     <div class="col col-sm-6" id="pm10umHeader">PM > 1.0um / 0.1L air:</div>
                     <div class="col col-sm-2" id="pm10umField">--</div>
                 </div>
-                <div class="row">
+                <div class="row hidden">
                     <div class="col col-sm-6" id="pm25umHeader">PM > 2.5um / 0.1L air:</div>
                     <div class="col col-sm-2" id="pm25umField">--</div>
                 </div>
-                <div class="row">
+                <div class="row hidden">
                     <div class="col col-sm-6" id="pm50umHeader">PM > 5.0um / 0.1L air:</div>
                     <div class="col col-sm-2" id="pm50umField">--</div>
                 </div>
-                <div class="row">
+                <div class="row hidden">
                     <div class="col col-sm-6" id="pm100umHeader">PM > 10um / 0.1L air:</div>
                     <div class="col col-sm-2" id="pm100umField">--</div>
                 </div>
@@ -146,12 +160,12 @@
                     <div class="col-sm"></div>
                 </div>
                 <div class="row">
-                    <div class="col-sm" id="logsHeader">Logs:</div>
-                    <div class="col-sm"></div>
-                    <div class="col-sm"></div>
+                    <div class="col col-sm-3" id="logsHeader">Logs:</div>
                 </div>
-                <div class="row pad-left">
-                    <div class="col-sm">N/A</div>
+                <div class="logContainer">
+                    <table class="table" id="logTable">
+                        <tbody></tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -159,7 +173,6 @@
 </html>
 
 <script>
-    $("#airQualityBar").width('100%');
     var x_max = 4; //max number of data points per plot
 
     var fontSize = 20;
@@ -317,27 +330,78 @@
 </script>
 
 <script>
+    //Ceiling values are based on
+    //https://www3.epa.gov/region1/airquality/pm-aq-standards.html
+    //There are no recommendations on PM1.0 values.  Ideally should be close to 0 as possible. Most harmful particulate matter
+    //Note PM10 is PM1.0, PM25 is PM2.5, and PM100 is PM10
+    var PM10_AIR_CEILING = 10;//no offical recommended value
+    var PM25_AIR_CEILING = 12;//recommended 12 ug/m3 or less for annual PM2.5 standard. 35 ug/m3 for daily value
+    var PM100_AIR_CEILING = 150;
+    var GOOD_AIR_COLOR = '#00ba00';
+    var FAIR_AIR_COLOR = 'yellow';
+    var POOR_AIR_COLOR = 'red';
+    var PM10_BAR_SCALAR = 100 / PM10_AIR_CEILING; //scalar used to accurately change bar graph size and color based on ceilings
+    var PM25_BAR_SCALAR = 100 / PM25_AIR_CEILING
+    var PM100_BAR_SCALAR = 100 / PM100_AIR_CEILING
+    
+    function updateLogs(msg) {
+        var data = $.parseJSON(msg);
+        var tbody = $("#logTable").children("tbody");
+		var table = tbody.length ? tbody : $("#logTable");
+        
+        table.append('<row><div>' + "[" + data['timeStamp'] + "] [" + data['logType'] + "]: " + data['sensor'] + " - " + data['exType'] + " - " + data['args'] + "</row></div>");
+
+        var objDiv = document.getElementById("logTable");
+        objDiv.scrollTop = objDiv.scrollHeight;
+    }
+    
+    function updateAirQualityBar(bar, barContainer, numParticles, scalar) {
+        var percent = numParticles * scalar; //percent of bar to remove based on num particles
+        
+        if (percent >= 100) {
+            bar.width('0%');
+        } else {
+            bar.width((100 - percent) + '%');
+        }
+        
+        if (percent <= 30) {
+            //barContainer.css({"border-color": GOOD_AIR_COLOR});
+            bar.css('background-color', GOOD_AIR_COLOR);
+        } else if (percent > 30 && percent <= 70) {
+            //barContainer.css({"border-color": FAIR_AIR_COLOR});
+            bar.css('background-color', FAIR_AIR_COLOR);
+        } else {
+            //barContainer.css({"border-color": POOR_AIR_COLOR});
+            bar.css('background-color', POOR_AIR_COLOR);
+        }
+    }
+    
     function updateAirQualityStats(msg) {
         var data = $.parseJSON(msg);
-        $("#pm10Field").text(data["pm10"]);
-        $("#pm25Field").text(data["pm25"]);
-        $("#pm100Field").text(data["pm100"]);
+        
+        var pm10 = data["pm10"];
+        var pm25 = data["pm25"]
+        var pm100 = data["pm100"]
+        
+        $("#pm10Field").text(pm10);
+        $("#pm25Field").text(pm25);
+        $("#pm100Field").text(pm100);
         $("#pm3umField").text(data["pm3um"]);
         $("#pm5umField").text(data["pm5um"]);
         $("#pm10umField").text(data["pm10um"]);
         $("#pm25umField").text(data["pm25um"]);
         $("#pm50umField").text(data["pm50um"]);
-        $("#pm100umField").text(data["pm100um"]);   
-    }
-    
-    function updateAirQualityError(msg) {
-        var numErrors = parseInt(msg);
-        $("#airQualityErrorField").text(
-            parseInt($("#airQualityErrorField").text) + numErrors);
+        $("#pm100umField").text(data["pm100um"]);
+        
+        
+        updateAirQualityBar($("#pm10Bar"), $("#pm10BarContainer"), pm10, PM10_BAR_SCALAR);
+        updateAirQualityBar($("#pm25Bar"), $("#pm25BarContainer"), pm25, PM25_BAR_SCALAR);
+        updateAirQualityBar($("#pm100Bar"), $("#pm100BarContainer"), pm100, PM100_BAR_SCALAR);
     }
     
     function updateGpsStats(msg) {
         var data = $.parseJSON(msg);
+        $("#fixField").text(data["fixType"]);
         $("#timeField").text(data["time"]);
         //$("#timeErrField").text(data["timeErr"]);
         $("#latitudeField").text(data["latitude"]);

@@ -11,14 +11,38 @@ body {
   font-size: 110%;
 }
 
-.borderGreen {
-  border: 2px solid #00ba00;
-  
+.table th, .table td, .table row{ 
+     border-top: none !important; 
+     font-size: 80%;
+ }
+
+.logContainer {
+  height: 180px;
+  overflow:auto;
 }
 
-.tab {
+.borderGreen {
+  border-right: 2px solid #00ba00;
+  height: 60px;
+}
+
+.airQualityBar {
+  height: 200px;
+}
+
+.airQualityBox {
+  height: 100%;
+}
+
+.top-buffer { 
+  margin-top:20px;
+}
+
+.bar {
   background-color: #00ba00;
   float: left;
+  width: 50%;
+  height: 100%;
 }
 
 .bold {
