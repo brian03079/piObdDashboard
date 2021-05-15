@@ -19,48 +19,36 @@ maxThrottleActuatorIdle = 2.5
 currentDtcCodes = []
 dtcCodesChanged = False
 
-connection = obd.OBD()
+def createLogMessage(ex, logType, sensor):
+    now = datetime.datetime.now()
+    timestamp = "%d:%d:%d" % (now.hour, now.minute, now.second)
+            
+    return {
+        'logType': ERROR,
+        'sensor' : SENSOR_TYPE,
+        'exType' : type(ex).__name__,
+        'args' : ex.args,
+        'timeStamp': timestamp
+    }
 
-# while not obd.is_connected():
-    # print("Initial OBD connection failed. Retrying.")
-    # sleep(1);
-    # connection = obd.OBD()
-    
-print("OBD connection established!")
 
-sio = socketio.Client()
-sio.connect('http://localhost:3000')
-
-def emitBaseTelemetry():
-    global idleTime
-
-    speedCmd = obd.commands.SPEED # select an OBD command (sensor)
-    response = connection.query(speedCmd) # send the command, and parse the response
-    speed = str(response.value.to("mph").magnitude)
-    
-    rpmCmd = obd.commands.RPM
-    response = connection.query(rpmCmd)
-    rpm = response.value.magnitude
-    
-    throttleCmd = obd.commands.THROTTLE_POS
-    response = connection.query(throttleCmd)
-    throttle = str(response.value.magnitude)
-    
-    runTimeCmd = obd.commands.RUN_TIME
-    response = connection.query(runTimeCmd)
-    runTime = str(response.value)
-    
-    throttleActuatorCmd = obd.commands.THROTTLE_ACTUATOR # less than 2.5% at idle
-    response = connection.query(throttleActuatorCmd)
-    throttleActuator = response.value.magnitude
-    
-    if (rpm <= maxIdleRpm and throttleActuator < maxThrottleActuatorIdle):
-        idleTime += delay
-    #idleTime = (idleTime + delay) if rpm <= maxIdleRpm else idleTime #this will have one decimal place. Parse on front end
-    
-    data = {'speed': speed, 'rpm': rpm, 'throttle': throttle, 'runTime': runTime, 'idleTime': idleTime}
-    sio.emit('data', json.dumps(data))
-
+numTries = 1
+while True: #loop until a connection is made with the server instead of immediately exiting
+    try:
+        connection = obd.OBD()
+        print("OBD connection established!")
+        
+        sio = socketio.Client()
+        sio.connect('http://localhost:3000')
+        break
+        
+    except Exception as ex:
+        numTries += 1
+        print("Unable to connect to node server, retrying attempt {0}".format(numTries))
+        time.sleep(1)
+            
+        continue
+        
 def emitDtcCodes():
     
     global dtcCodesChanged
@@ -82,30 +70,50 @@ def emitDtcCodes():
         sio.emit('dtcData', currentDtcCodes())
         dtcCodesChanged = False
 
-@sio.on('my message')
-def on_message(data):
-    print('I received a message!')
+def emitTelemetry():
+    global idleTime
+    
+    while True:
+        try:
+            speedCmd = obd.commands.SPEED # select an OBD command (sensor)
+            response = connection.query(speedCmd) # send the command, and parse the response
+            speed = str(response.value.to("mph").magnitude)
+            
+            rpmCmd = obd.commands.RPM
+            response = connection.query(rpmCmd)
+            rpm = response.value.magnitude
+            
+            throttleCmd = obd.commands.THROTTLE_POS
+            response = connection.query(throttleCmd)
+            throttle = str(response.value.magnitude)
+            
+            runTimeCmd = obd.commands.RUN_TIME
+            response = connection.query(runTimeCmd)
+            runTime = str(response.value)
+            
+            throttleActuatorCmd = obd.commands.THROTTLE_ACTUATOR # less than 2.5% at idle
+            response = connection.query(throttleActuatorCmd)
+            throttleActuator = response.value.magnitude
+            
+            if (speed < .1):
+                idleTime += delay
+            
+            data = {'speed': speed, 'rpm': rpm, 'throttle': throttle, 'runTime': runTime, 'idleTime': idleTime}
+            sio.emit('data', json.dumps(data))
+            
+            emitDtcCodes()
+            
+            time.sleep(.3)
+            
+        except Exception as ex: #logs any errors encountered during reading of gps. Also allows program to pick back up if node server connection is lost
+            errorLog = createLogMessage(ERROR, SENSOR_TYPE, type(ex).__name__, ex.args)
+            print(errorLog)
+            sio.emit('log', json.dumps(errorLog)) #will only work if exception is unrelated to node server connection
+            continue
+
 
 @sio.event
 def connect():
     print("Connected to node server!")
+    emitTelemetry()
 
-    while (True):
-        emitBaseTelemetry()
-        emitDtcCodes()
-        time.sleep(.3) #fastest refresh speed before web app begins to lag. If you are using your phone to connect, then even .15s is fine (tested on pixel 3a)
-
-#attempt to reconnect on connection error
-@sio.event
-def connect_error():
-    print("Node server connect failed. Retrying.")
-    time.sleep(3)
-    sio.connect('http://localhost:3000')
-
-@sio.event
-def disconnect():
-    print("I'm disconnected!")
-
-@sio.event
-def message(data):
-    print('I received a message!')

@@ -9,7 +9,7 @@
         <link rel="stylesheet" type="text/css" href="/css/miscDashboard.css" />
         <script src="/js/socket.io.min.js"></script>
         <div id="gpsDiv" class="divider">
-            <div class="container-fluid">
+            <div class="container-fluid d-flex h-100 flex-column">
                 <div class="row">
                     <div class="col col-sm-2">
                         <h4 class="bold">GPS</h4>
@@ -23,31 +23,31 @@
                     <div class="col col-sm-2">+/-</div>
                     <div class="col col-sm-2" id="latitudeErrField">--</div>
                 </div>
-                <div class="row">
+                <div class="row paddingTop">
                     <div class="col col-sm-4">Longitude:</div>
                     <div class="col col-sm-3" id="longitudeField">--</div>
                     <div class="col col-sm-2">+/-</div>
                     <div class="col col-sm-2" id="longitudeErrField">--</div>
                 </div>
-                <div class="row">
+                <div class="row paddingTop">
                     <div class="col col-sm-4">Altitude(m):</div>
                     <div class="col col-sm-3" id="altitudeField">--</div>
                     <div class="col col-sm-2">+/-</div>
                     <div class="col col-sm-2" id="altitudeErrField">--</div>
                 </div>
-                <div class="row">
+                <div class="row hidden">
                     <div class="col col-sm-4">Speed(mph):</div>
                     <div class="col col-sm-3" id="speedField">--</div>
                     <div class="col col-sm-2">+/-</div>
                     <div class="col col-sm-2" id="speedErrField">--</div>
                 </div>
-                <div class="row">
+                <div class="row paddingTop">
                     <div class="col col-sm-4">Climb(m/s):</div>
                     <div class="col col-sm-3" id="climbField">--</div>
                     <div class="col col-sm-2">+/-</div>
                     <div class="col col-sm-2" id="climbErrField">--</div>
                 </div>
-                <div class="row">
+                <div class="row paddingTop">
                     <div class="col col-sm-4">Heading&deg;:</div>
                     <div class="col col-sm-3" id="headingField">--</div>
                     <div class="col col-sm-2"></div>
@@ -87,30 +87,30 @@
             </div>
         </div>
         <div id="airQualityDiv" class="divider">
-            <div class="container-fluid">
+            <div class="container-fluid d-flex h-100 flex-column">
                 <div class="row">
                     <div class="col col-sm-6">
                         <h4 class="bold">Air Quality</h4>
                     </div>
                 </div>
-                <div class="row top-buffer">
-                    <div class="col col-sm-2" id="pm10Header">PM1.0:</div>
+                <div class="row h-100">
+                    <div class="col col-sm-3" id="pm10Header">PM1.0:</div>
                     <div class="col col-sm-2" id="pm10Field">--</div>
-                    <div class="col col-sm-7 borderGreen" id="pm10BarContainer">
+                    <div class="col col-sm-7 padding-0 borderGreen" id="pm10BarContainer">
                         <div class="bar" id="pm10Bar">-</div>
                     </div>
                 </div>
-                <div class="row top-buffer">
-                    <div class="col col-sm-2" id="pm25Header">PM2.5:</div>
+                <div class="row h-100">
+                    <div class="col col-sm-3" id="pm25Header">PM2.5:</div>
                     <div class="col col-sm-2" id="pm25Field">--</div>
-                    <div class="col col-sm-7 borderGreen" id="pm25BarContainer">
+                    <div class="col col-sm-7 padding-0 borderGreen" id="pm25BarContainer">
                         <div class="bar" id="pm25Bar">-</div>
                     </div>
                 </div>
-                <div class="row top-buffer">
-                    <div class="col col-sm-2" id="pm100Header">PM10:</div>
+                <div class="row h-100">
+                    <div class="col col-sm-3" id="pm100Header">PM10:</div>
                     <div class="col col-sm-2" id="pm100Field">--</div>
-                    <div class="col col-sm-7 borderGreen" id="pm100BarContainer">
+                    <div class="col col-sm-7 padding-0 borderGreen" id="pm100BarContainer">
                         <div class="bar" id="pm100Bar">-</div>
                     </div>
                 </div>
@@ -147,22 +147,20 @@
         <div id="miscDataDiv" class="divider">
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-sm">Accel:</div>
-                    <div class="col-sm">--</div>
-                    <div class="col-sm">Gs:</div>
-                    <div class="col-sm">--</div>
+                    <div class="col col-sm-3">Accel:</div>
+                    <div class="col col-sm-2">--</div>
+                    <div class="col col-sm-3">Gs:</div>
+                    <div class="col col-sm-2">--</div>
                 </div>
                 <div class="row">
-                    <div class="col col-sm-6" id="cpuTempHeader">CPU Temp(&deg;F):</div>
+                    <div class="col col-sm-3" id="cpuTempHeader">CPU &deg;F:</div>
                     <div class="col col-sm-2" id="cpuTempField">--</div>
                 </div>
                 <div class="row">
                     <div class="col col-sm-3" id="logsHeader">Logs:</div>
                 </div>
                 <div class="logContainer">
-                    <table class="table" id="logTable">
-                        <tbody></tbody>
-                    </table>
+                    <div class="row log pad-left"><div>[22:32:31] [ERR]: AIR - RuntimeError - Invalid PM2.5 checksum</div></div>
                 </div>
             </div>
         </div>
@@ -331,44 +329,71 @@
     //https://www3.epa.gov/region1/airquality/pm-aq-standards.html
     //There are no recommendations on PM1.0 values.  Ideally should be close to 0 as possible. Most harmful particulate matter
     //Note PM10 is PM1.0, PM25 is PM2.5, and PM100 is PM10
-    var PM10_AIR_CEILING = 10;//no offical recommended value
-    var PM25_AIR_CEILING = 12;//recommended 12 ug/m3 or less for annual PM2.5 standard. 35 ug/m3 for daily value
-    var PM100_AIR_CEILING = 150;
-    var GOOD_AIR_COLOR = '#00ba00';
+    var PM10_AIR_CEILING = 14 * 2;//no offical recommended value. Multiply by 2 to set max num particles per bar
+    var PM25_AIR_CEILING = 35 * 2;//recommended 12 ug/m3 or less for annual PM2.5 standard. 35 ug/m3 for daily value
+    var PM100_AIR_CEILING = 54 * 2; //recommended 150 ug/m3 per day. 50 ug/m3 for annual value, but was revoked sept 2006
+    var GOOD_AIR_COLOR = '#00ba00'; //neon-ish green
     var FAIR_AIR_COLOR = 'yellow';
-    var POOR_AIR_COLOR = 'red';
+    var POOR_AIR_COLOR = 'rgb(255, 0, 0)'; //red
     var PM10_BAR_SCALAR = 100 / PM10_AIR_CEILING; //scalar used to accurately change bar graph size and color based on ceilings
-    var PM25_BAR_SCALAR = 100 / PM25_AIR_CEILING
-    var PM100_BAR_SCALAR = 100 / PM100_AIR_CEILING
+    var PM25_BAR_SCALAR = 100 / PM25_AIR_CEILING;
+    var PM100_BAR_SCALAR = 100 / PM100_AIR_CEILING;
+    
+    var barGraphs = [
+        $("#pm10Bar"),
+        $("#pm25Bar"),
+        $("#pm100Bar")
+    ]
+
+    //set the air quality bars to flash if they are red
+    $(document).ready(() => {
+        
+        setInterval(() => {
+            for (i = 0; i < barGraphs.length; i++) {
+                var rgbColor = barGraphs[i].css("background-color");
+
+                if (rgbColor == POOR_AIR_COLOR) {
+                    barGraphs[i].toggleClass("hidden");
+                } else {
+                    barGraphs[i].removeClass("hidden");
+                }
+            }
+        }, 1000); //in ms
+    });
     
     function updateLogs(msg) {
         var data = $.parseJSON(msg);
         var tbody = $("#logTable").children("tbody");
 		var table = tbody.length ? tbody : $("#logTable");
         
-        table.append('<row><div>' + "[" + data['timeStamp'] + "] [" + data['logType'] + "]: " + data['sensor'] + " - " + data['exType'] + " - " + data['args'] + "</row></div>");
+        table.append('<div class="row log pad-left"><div>' + "[" + data['timeStamp'] + "] [" + data['logType'] + "]: " + data['sensor'] + " - " + data['exType'] + " - " + data['args'] + "</div></div>");
 
         var objDiv = document.getElementById("logTable");
         objDiv.scrollTop = objDiv.scrollHeight;
     }
     
-    function updateAirQualityBar(bar, barContainer, numParticles, scalar) {
-        var percent = numParticles * scalar; //percent of bar to remove based on num particles
+    function updateAirQualityBar(barTextField, bar, barContainer, numParticles, scalar) {
         
+        var percent = numParticles * scalar; //percent of bar to remove based on num particles
+        //console.log(bar.attr('id') + ' ' + numParticles + ' ' + scalar + ' ' + percent);
         if (percent >= 100) {
             bar.width('100%');
         } else {
             bar.width(percent + '%');
+            console.log(bar.attr('id'));
         }
         
-        if (percent <= 70) {
-            //barContainer.css({"border-color": GOOD_AIR_COLOR});
+        if (percent <= 50) { // 50% of ceiling is the max recommended exposure amount
+            barTextField.css('color', GOOD_AIR_COLOR);
+            barContainer.css('border-color', GOOD_AIR_COLOR);
             bar.css('background-color', GOOD_AIR_COLOR);
-        } else if (percent > 70 && percent <= 90) {
-            //barContainer.css({"border-color": FAIR_AIR_COLOR});
+        } else if (percent > 50 && percent <= 70) {
+            barTextField.css('color', FAIR_AIR_COLOR);
+            barContainer.css({"border-color": FAIR_AIR_COLOR});
             bar.css('background-color', FAIR_AIR_COLOR);
         } else {
-            //barContainer.css({"border-color": POOR_AIR_COLOR});
+            barTextField.css('color', POOR_AIR_COLOR);
+            barContainer.css({"border-color": POOR_AIR_COLOR});
             bar.css('background-color', POOR_AIR_COLOR);
         }
     }
@@ -377,8 +402,8 @@
         var data = $.parseJSON(msg);
         
         var pm10 = data["pm10"];
-        var pm25 = data["pm25"]
-        var pm100 = data["pm100"]
+        var pm25 = data["pm25"];
+        var pm100 = data["pm100"];
         
         $("#pm10Field").text(pm10);
         $("#pm25Field").text(pm25);
@@ -391,9 +416,9 @@
         $("#pm100umField").text(data["pm100um"]);
         
         
-        updateAirQualityBar($("#pm10Bar"), $("#pm10BarContainer"), pm10, PM10_BAR_SCALAR);
-        updateAirQualityBar($("#pm25Bar"), $("#pm25BarContainer"), pm25, PM25_BAR_SCALAR);
-        updateAirQualityBar($("#pm100Bar"), $("#pm100BarContainer"), pm100, PM100_BAR_SCALAR);
+        updateAirQualityBar($("#pm10Field"), $("#pm10Bar"), $("#pm10BarContainer"), pm10, PM10_BAR_SCALAR);
+        updateAirQualityBar($("#pm25Field"), $("#pm25Bar"), $("#pm25BarContainer"), pm25, PM25_BAR_SCALAR);
+        updateAirQualityBar($("#pm100Field"), $("#pm100Bar"), $("#pm100BarContainer"), pm100, PM100_BAR_SCALAR);
     }
     
     function updateGpsStats(msg) {

@@ -11,6 +11,10 @@ body {
   font-size: 120%;
 }
 
+.log {
+  font-size: 70%;
+}
+
 .subheading {
   font-size: 80%;
 }
@@ -19,6 +23,15 @@ body {
      border-top: none !important; 
      font-size: 80%;
  }
+ 
+.padding-0{
+    padding-right:0;
+    padding-left:0;
+}
+ 
+.paddingTop {
+  padding-top: .2rem;
+}
  
 .topBorder {
   border-top: 2px solid #00ba00;
@@ -43,7 +56,7 @@ body {
 }
 
 .top-buffer { 
-  margin-top:20px;
+  margin-top: .5rem;
 }
 
 .bar {
