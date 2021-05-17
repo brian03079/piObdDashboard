@@ -5,14 +5,21 @@ body {
   padding: 0;
   background-color: black !important;
   color: #00ba00 !important;
-  padding-bottom: .5rem;
-  padding-top: .5rem;
+  padding-bottom: .2em;
+  padding-top: .5em;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  font-size: 120%;
+  font-size: 1.3em;
+}
+
+.bttn {
+  background-color: black;
+  border-color: #00ba00;
+  border-width: 1em;
+  color: #00ba00;
 }
 
 .log {
-  font-size: 70%;
+  font-size: .6em;
 }
 
 .subheading {
@@ -21,7 +28,6 @@ body {
 
 .table th, .table td, .table row{ 
      border-top: none !important; 
-     font-size: 80%;
  }
  
 .padding-0{

@@ -4,6 +4,13 @@
         <script src="/js/jquery.min.js"></script>
         <script src="/js/plotly-latest.min.js"></script>
         <script src="/js/bootstrap.min.js"></script>
+        <script src="/js/imuJS/three.min.js"></script>
+        <script src="/js/imuJS/DDSLoader.js"></script>
+        <script src="/js/imuJS/MTLLoader.js"></script>
+        <script src="/js/imuJS/OBJMTLLoader.js"></script>
+        <script src="/js/imuJS/OBJLoader.js"></script>
+        <script src="/js/imuJS/STLLoader.js"></script>
+              
         <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css" />
         <link rel="stylesheet" type="text/css" href="/css/bootstrap-theme.min.css" />
         <link rel="stylesheet" type="text/css" href="/css/miscDashboard.css" />
@@ -61,30 +68,29 @@
                 </div>
             </div>
         </div>
-        <div id="GyroPitchDiv" class="divider">
+        <div id="imuDIV" class="divider">
 
             <div class="container-fluid">
                 <div class="row">
                     <div class="col col-sm-3">
                         <h4 class="bold">Pitch&deg;</h4>
                     </div>
-                    <div class="col-sm">
-                        <h4>--</h4>
+                    <div class="col col-sm-2">
+                        <h4 id="pitch">--</h4>
                     </div>
                     <div class="col col-sm-3">
                         <h4 class="bold">Roll&deg;</h4>
                     </div>
-                    <div class="col-sm">--</div>
+                        <h4 id="roll">--</h4>
+                    <div class="col col-sm-2">
+                        <div class="bttn" id="straighten">S</div>
+                    </div>
                 </div>
                 <div class="row">
-                    <div class="col-sm">
-                        <div id="pitchGraph"></div>
-                    </div>
-                    <div class="col-sm">
-                        <div id="rollGraph"></div>
+                    <div class="col-sm-12" id="renderer">
                     </div>
                 </div>
-            </div>
+              </div>
         </div>
         <div id="airQualityDiv" class="divider">
             <div class="container-fluid d-flex h-100 flex-column">
@@ -168,163 +174,13 @@
 </html>
 
 <script>
-    var x_max = 4; //max number of data points per plot
 
-    var fontSize = 20;
-    var defaultColor = '#00ba00';
-    var plotBackgroundColor = '#000000';
-    var plotHeight = 220;
-    var plotWidth = 220;
-    var plotLeftMargin = 0;
-    var plotRightMargin = 0;
-    var plotBottomMargin = 0;
-    var plotTopMargin = 0;
-    var padding = 1; //spacing between graph and labels
-    var numXTicks = 5; //max number of x labels per graph
-    var tickAngle = 0;
-    var lineWidth = 1;
-
-    var config = {
-        responsive: true
-    }
-
-    var gpsPitchLayout = {
-        autosize: true,
-        height: plotHeight,
-        width: plotWidth,
-        margin: {
-            l: plotLeftMargin,
-            r: plotRightMargin,
-            b: plotBottomMargin,
-            t: plotTopMargin,
-            pad: padding
-        },
-        xaxis: {
-            tickangle: tickAngle,
-            nticks: numXTicks,
-            color: defaultColor,
-            showgrid: false
-        },
-        yaxis: {
-            color: defaultColor,
-            showgrid: false
-        },
-        font: {
-            size: fontSize,
-            color: defaultColor
-        },
-        paper_bgcolor: plotBackgroundColor,
-        plot_bgcolor: plotBackgroundColor
-    };
-
-    Plotly.react('pitchGraph', [{
-        x: [0],
-        y: [0],
-        type: 'line',
-        line: {
-            color: defaultColor,
-            width: lineWidth
-        },
-    }], gpsPitchLayout, config);
-
-    function updatePitchGraph(angle) {
-
-
-
-        var speedTrace = {
-            x: [
-                [time]
-            ],
-            y: [
-                [speed]
-            ]
-        }
-        Plotly.extendTraces('pitchGraph', speedTrace, [0], x_max);
-    }
-
-
-    var config = {
-        responsive: true
-    }
-
-    var gpsRollLayout = {
-        autosize: true,
-        height: plotHeight,
-        width: plotWidth,
-        margin: {
-            l: plotLeftMargin,
-            r: plotRightMargin,
-            b: plotBottomMargin,
-            t: plotTopMargin,
-            pad: padding
-        },
-        xaxis: {
-            tickangle: tickAngle,
-            nticks: numXTicks,
-            color: defaultColor,
-            showgrid: false
-        },
-        yaxis: {
-            color: defaultColor,
-            showgrid: false
-        },
-        font: {
-            size: fontSize,
-            color: defaultColor
-        },
-        paper_bgcolor: plotBackgroundColor,
-        plot_bgcolor: plotBackgroundColor
-    };
-
-    Plotly.react('rollGraph', [{
-        x: [0],
-        y: [0],
-        type: 'line',
-        line: {
-            color: defaultColor,
-            width: lineWidth
-        },
-    }], gpsRollLayout, config);
-
-    function updatePitchGraph(angle) {
-
-
-
-        var speedTrace = {
-            x: [
-                [time]
-            ],
-            y: [
-                [speed]
-            ]
-        }
-        Plotly.extendTraces('rollGraph', speedTrace, [0], x_max);
-    }
-
-    var socket = io();
-    if (socket != null) {
-        $("#statusField").text = "Connected";
-    }
     
-    socket.on("airQualityData", function(msg) {
-        updateAirQualityStats(msg);
-    });
-    
-    socket.on("log", function(msg) {
-        updateLogs(msg);
-    });
-
-    socket.on("gpsData", function(msg) {
-        updateGpsStats(msg);
-    });
-    
-    socket.on("orientationData", function(msg) {
-        updatePitchGraph(pitchAngle);
-        updateRollGraph(rollAngle);
-    });
 </script>
 
 <script>
+    var DEFAULT_COLOR = '#00ba00'
+    
     //Ceiling values are based on
     //https://www3.epa.gov/region1/airquality/pm-aq-standards.html
     //There are no recommendations on PM1.0 values.  Ideally should be close to 0 as possible. Most harmful particulate matter
@@ -332,9 +188,9 @@
     var PM10_AIR_CEILING = 14 * 2;//no offical recommended value. Multiply by 2 to set max num particles per bar
     var PM25_AIR_CEILING = 35 * 2;//recommended 12 ug/m3 or less for annual PM2.5 standard. 35 ug/m3 for daily value
     var PM100_AIR_CEILING = 54 * 2; //recommended 150 ug/m3 per day. 50 ug/m3 for annual value, but was revoked sept 2006
-    var GOOD_AIR_COLOR = '#00ba00'; //neon-ish green
+    var GOOD_AIR_COLOR = DEFAULT_COLOR; //neon-ish green
     var FAIR_AIR_COLOR = 'yellow';
-    var POOR_AIR_COLOR = 'rgb(255, 0, 0)'; //red
+    var POOR_AIR_COLOR = 'rgb(255, 0, 0)'; //red. RGB value used for easier comparison logic later
     var PM10_BAR_SCALAR = 100 / PM10_AIR_CEILING; //scalar used to accurately change bar graph size and color based on ceilings
     var PM25_BAR_SCALAR = 100 / PM25_AIR_CEILING;
     var PM100_BAR_SCALAR = 100 / PM100_AIR_CEILING;
@@ -343,11 +199,35 @@
         $("#pm10Bar"),
         $("#pm25Bar"),
         $("#pm100Bar")
-    ]
+    ];
 
-    //set the air quality bars to flash if they are red
+    
     $(document).ready(() => {
         
+        /*begin code to setup listeners for data*/
+        
+        var socket = io();
+        if (socket != null) {
+            $("#statusField").text = "Connected";
+        }
+        
+        socket.on("airQualityData", function(msg) {
+            updateAirQualityStats(msg);
+        });
+        
+        socket.on("log", function(msg) {
+            updateLogs(msg);
+        });
+
+        socket.on("gpsData", function(msg) {
+            updateGpsStats(msg);
+        });
+        
+        socket.on("imuData", function(msg) {
+            updateSensorData(msg);
+        });
+        
+        //set the air quality bars to flash if they are red
         setInterval(() => {
             for (i = 0; i < barGraphs.length; i++) {
                 var rgbColor = barGraphs[i].css("background-color");
@@ -359,85 +239,232 @@
                 }
             }
         }, 1000); //in ms
-    });
-    
-    function updateLogs(msg) {
-        var data = $.parseJSON(msg);
-        var tbody = $("#logTable").children("tbody");
-		var table = tbody.length ? tbody : $("#logTable");
         
-        table.append('<div class="row log pad-left"><div>' + "[" + data['timeStamp'] + "] [" + data['logType'] + "]: " + data['sensor'] + " - " + data['exType'] + " - " + data['args'] + "</div></div>");
+        /*begin code for IMU webgl render section
+        //a lot of the webgl three js code is based on 
+        //https://github.com/adafruit/Adafruit_CircuitPython_BNO055.git
+        */
+        
+        var meshFloor = new THREE.Mesh(
+            new THREE.PlaneGeometry(100, 50, 15, 15),
+            new THREE.MeshBasicMaterial({
+                color: DEFAULT_COLOR,
+                wireframe: true
+            })
+        );
+        meshFloor.rotation.x -= Math.PI / 2;
 
-        var objDiv = document.getElementById("logTable");
-        objDiv.scrollTop = objDiv.scrollHeight;
-    }
-    
-    function updateAirQualityBar(barTextField, bar, barContainer, numParticles, scalar) {
+        // Set size of the WebGL renderer scene.
+        var sceneWidth = $("#imuDIV").width();
+        var sceneHeight = $("#imuDIV").height() - 50;
+
+        var models = [{
+            name: 'Miata',
+            load: function(model) {
+                stlLoader.load(
+                    'objects/miata.stl',
+                    function(geometry) {
+                        // Regenerate normals because they aren't loaded properly.
+                        geometry.computeFaceNormals();
+                        geometry.computeVertexNormals();
+                        // Load the model and build mesh.
+                        model.model = new THREE.Mesh(geometry, material);
+                        // Rotate, scale, and move so the cat is facing out the screen.
+                        model.model.rotation.x = -90 * (Math.PI / 180.0);
+                        model.model.rotation.z = -180 * (Math.PI / 180.0);
+                        model.model.scale.set(5, 5, 5);
+                        model.model.position.y = 1.5;
+                    }
+                );
+            }
+        }];
+
+        // Global state.
+        var bnoData = null;
+        var offset = null;
+        var orientation = null;
+        var objMTLLoader = new THREE.OBJMTLLoader();
+        var stlLoader = new THREE.STLLoader();
+        var currentModel = null;
+
+        // Setup Three.js scene and camera.
+        var scene = new THREE.Scene();
+        var camera = new THREE.PerspectiveCamera(45, sceneWidth / sceneHeight, 1, 1000);
+
+
+        // Setup Three.js WebGL renderer and add it to the page.
+        var renderer = new THREE.WebGLRenderer({
+            antialias: true
+        });
+        renderer.setSize(sceneWidth, sceneHeight);
+        renderer.setClearColor(0xff0000, 0);
+        $('#renderer').append(renderer.domElement);
+        $('#renderer canvas').addClass('center-block'); // Center the renderer.
+
+        //try to center car and zoom out to appropriate distance 
+        camera.position.set(0, 6, 20);
+
+
+        // Create default green material for the model
+        var material = new THREE.MeshPhongMaterial({
+            color: DEFAULT_COLOR,
+            wireframe: false
+        });
+
+        // Setup 3 point lighting with a green point light in upper left
+        // and right corners, plus a bit of backlight from the rear forward.
+        var pointLight1 = new THREE.PointLight('white', 0.6);
+        pointLight1.position.set(40, 15, 40);
+        scene.add(pointLight1);
+        var pointLight2 = new THREE.PointLight('white', 0.6);
+        pointLight2.position.set(-40, 15, 40);
+        scene.add(pointLight2);
+        var backLight = new THREE.DirectionalLight('white', 0.3);
+        backLight.position.set(0, -0.25, -1);
+        scene.add(backLight);
+
+        // Create a couple groups to apply rotations to the 3D model at different
+        // stages.  The outer group called offset is set to the reverse rotation
+        // of the current BNO orientation when the 'Straighten' button is clicked.
+        // This will force the model to center itself staring directly out of
+        // the screen.  The inner group called orientation will be rotated with
+        // the current BNO sensor orientation and cause the model to rotate.
+        offset = new THREE.Group();
+        orientation = new THREE.Group();
+        offset.add(orientation);
+        scene.add(offset);
+        scene.add(meshFloor);
+
+        // Main rendering function.
+        function render() {
+            requestAnimationFrame(render);
+            // Switch to the first model once it's loaded.
+            if (currentModel === null) {
+                if (models[0].hasOwnProperty('model')) {
+                    currentModel = 0;
+                    orientation.add(models[0].model);
+                }
+            }
+            // Update the orientation with the last BNO sensor reading quaternion.
+            if (bnoData !== null) {
+                orientation.quaternion.set(bnoData.quatY, 0, bnoData.quatZ, bnoData.quatW); // note the swapping of x, y in args for correct orientation
+            }
+            renderer.render(scene, camera);
+        }
+
+        render();
+
+        //zeros/resets the orientation of the car model
+        $('#straighten').click(function() {
+            // Get the current orientation of the BNO sensor and compute its
+            // conjugate or reverse rotation and apply it to the offset group.
+            // This will reset the 3D model so that it faces directly forward based
+            // on the current BNO sensor orientation.
+            var currentQuat = new THREE.Quaternion(bnoData.quatY, 0, bnoData.quatZ, bnoData.quatW); // note the swapping of x, y in args for correct orientation
+            offset.quaternion.copy(currentQuat.conjugate());
+        });
+
+        // Populate 3D models and load 
+        $.each(models, function(index, model) {
+            model.load(model);
+        });
+
+
+        //begin code for calling code to update all data on the page
         
-        var percent = numParticles * scalar; //percent of bar to remove based on num particles
-        //console.log(bar.attr('id') + ' ' + numParticles + ' ' + scalar + ' ' + percent);
-        if (percent >= 100) {
-            bar.width('100%');
-        } else {
-            bar.width(percent + '%');
-            console.log(bar.attr('id'));
+        function updateLogs(msg) {
+            var data = $.parseJSON(msg);
+            var tbody = $("#logTable").children("tbody");
+            var table = tbody.length ? tbody : $("#logTable");
+            
+            table.append('<div class="row log pad-left"><div>' + "[" + data['timeStamp'] + "] [" + data['logType'] + "]: " + data['sensor'] + " - " + data['exType'] + " - " + data['args'] + "</div></div>");
+
+            var objDiv = document.getElementById("logTable");
+            objDiv.scrollTop = objDiv.scrollHeight;
         }
         
-        if (percent <= 50) { // 50% of ceiling is the max recommended exposure amount
-            barTextField.css('color', GOOD_AIR_COLOR);
-            barContainer.css('border-color', GOOD_AIR_COLOR);
-            bar.css('background-color', GOOD_AIR_COLOR);
-        } else if (percent > 50 && percent <= 70) {
-            barTextField.css('color', FAIR_AIR_COLOR);
-            barContainer.css({"border-color": FAIR_AIR_COLOR});
-            bar.css('background-color', FAIR_AIR_COLOR);
-        } else {
-            barTextField.css('color', POOR_AIR_COLOR);
-            barContainer.css({"border-color": POOR_AIR_COLOR});
-            bar.css('background-color', POOR_AIR_COLOR);
+        function updateAirQualityBar(barTextField, bar, barContainer, numParticles, scalar) {
+            
+            var percent = numParticles * scalar; //percent of bar to remove based on num particles
+
+            if (percent >= 100) {
+                bar.width('100%');
+            } else {
+                bar.width(percent + '%');
+            }
+            
+            if (percent <= 50) { // 50% of ceiling is the max recommended exposure amount
+                barTextField.css('color', GOOD_AIR_COLOR);
+                barContainer.css('border-color', GOOD_AIR_COLOR);
+                bar.css('background-color', GOOD_AIR_COLOR);
+            } else if (percent > 50 && percent <= 70) {
+                barTextField.css('color', FAIR_AIR_COLOR);
+                barContainer.css({"border-color": FAIR_AIR_COLOR});
+                bar.css('background-color', FAIR_AIR_COLOR);
+            } else {
+                barTextField.css('color', POOR_AIR_COLOR);
+                barContainer.css({"border-color": POOR_AIR_COLOR});
+                bar.css('background-color', POOR_AIR_COLOR);
+            }
         }
-    }
+        
+        function updateAirQualityStats(msg) {
+            var data = $.parseJSON(msg);
+            
+            var pm10 = data["pm10"];
+            var pm25 = data["pm25"];
+            var pm100 = data["pm100"];
+            
+            $("#pm10Field").text(pm10);
+            $("#pm25Field").text(pm25);
+            $("#pm100Field").text(pm100);
+            $("#pm3umField").text(data["pm3um"]);
+            $("#pm5umField").text(data["pm5um"]);
+            $("#pm10umField").text(data["pm10um"]);
+            $("#pm25umField").text(data["pm25um"]);
+            $("#pm50umField").text(data["pm50um"]);
+            $("#pm100umField").text(data["pm100um"]);
+            
+            
+            updateAirQualityBar($("#pm10Field"), $("#pm10Bar"), $("#pm10BarContainer"), pm10, PM10_BAR_SCALAR);
+            updateAirQualityBar($("#pm25Field"), $("#pm25Bar"), $("#pm25BarContainer"), pm25, PM25_BAR_SCALAR);
+            updateAirQualityBar($("#pm100Field"), $("#pm100Bar"), $("#pm100BarContainer"), pm100, PM100_BAR_SCALAR);
+        }
+        
+        function updateGpsStats(msg) {
+            var data = $.parseJSON(msg);
+            var date = new Date(data["time"]);
+            
+            $("#fixField").text("[" + data["fixType"] + "]");
+            $("#timeField").text(date.toUTCString());
+            //$("#timeErrField").text(data["timeErr"]);
+            $("#latitudeField").text(data["latitude"]);
+            $("#latitudeErrField").text(data["latitudeErr"]);
+            $("#longitudeField").text(data["longitude"]);
+            $("#longitudeErrField").text(data["longitudeErr"]);
+            $("#altitudeField").text(data["altitude"]);
+            $("#altitudeErrField").text(data["altitudeErr"]);
+            $("#speedField").text(data["speed"]);
+            $("#speedErrField").text(data["speedErr"]);
+            $("#climbField").text(data["climb"]);
+            $("#climbErrField").text(data["climbErr"]);
+            //$("#headingField").text(data["heading"]);
+        }
+        
+        function updateSensorData(msg) {
+            var data = $.parseJSON(msg);
+            var pitch = data.roll.toFixed(1); //need to reverse pitch and roll for accurate orientation. Mismatch somewhere?
+            var roll = data.pitch.toFixed(1); //sensor is being layed on a flat surface
+            bnoData = data;
+            
+            $('#heading').text(data.heading);
+            $('#roll').text(roll);
+            $('#pitch').text(pitch);
+            $('#calSys').text(data.calSys);
+            $('#calGyro').text(data.calGyro);
+            $('#calAccel').text(data.calAccel);
+            $('#calMag').text(data.calMag);
+        }
     
-    function updateAirQualityStats(msg) {
-        var data = $.parseJSON(msg);
-        
-        var pm10 = data["pm10"];
-        var pm25 = data["pm25"];
-        var pm100 = data["pm100"];
-        
-        $("#pm10Field").text(pm10);
-        $("#pm25Field").text(pm25);
-        $("#pm100Field").text(pm100);
-        $("#pm3umField").text(data["pm3um"]);
-        $("#pm5umField").text(data["pm5um"]);
-        $("#pm10umField").text(data["pm10um"]);
-        $("#pm25umField").text(data["pm25um"]);
-        $("#pm50umField").text(data["pm50um"]);
-        $("#pm100umField").text(data["pm100um"]);
-        
-        
-        updateAirQualityBar($("#pm10Field"), $("#pm10Bar"), $("#pm10BarContainer"), pm10, PM10_BAR_SCALAR);
-        updateAirQualityBar($("#pm25Field"), $("#pm25Bar"), $("#pm25BarContainer"), pm25, PM25_BAR_SCALAR);
-        updateAirQualityBar($("#pm100Field"), $("#pm100Bar"), $("#pm100BarContainer"), pm100, PM100_BAR_SCALAR);
-    }
-    
-    function updateGpsStats(msg) {
-        var data = $.parseJSON(msg);
-        var date = new Date(data["time"]);
-        
-        $("#fixField").text("[" + data["fixType"] + "]");
-        $("#timeField").text(date.toUTCString());
-        //$("#timeErrField").text(data["timeErr"]);
-        $("#latitudeField").text(data["latitude"]);
-        $("#latitudeErrField").text(data["latitudeErr"]);
-        $("#longitudeField").text(data["longitude"]);
-        $("#longitudeErrField").text(data["longitudeErr"]);
-        $("#altitudeField").text(data["altitude"]);
-        $("#altitudeErrField").text(data["altitudeErr"]);
-        $("#speedField").text(data["speed"]);
-        $("#speedErrField").text(data["speedErr"]);
-        $("#climbField").text(data["climb"]);
-        $("#climbErrField").text(data["climbErr"]);
-        //$("#headingField").text(data["heading"]);
-    }
+    });
 </script>

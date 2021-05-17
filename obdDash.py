@@ -9,6 +9,9 @@ import plotly.graph_objs as go
 from collections import deque 
 from obd import OBDStatus
 
+SENSOR_TYPE = 'OBD'
+ERROR = 'ERR'
+
 
 delay = 0.3 #Delay in seconds before sending data
 
