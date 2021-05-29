@@ -8,12 +8,13 @@ from gps import *
 
 SENSOR_TYPE = 'GPS'
 ERROR = 'ERR'
+INFO = 'INFO'
 LATITUDE_DEC_PLACES = 5
 LONGITUDE_DEC_PLACES = 5
 SPEED_DEC_PLACES = 2
 FT_DEC_PLACES = 2
-MPH_MULTIPLIER = 2.2369
-FT_MULTIPLIER = 3.28084
+MPH_MULTIPLIER = 2.2369 #when converting kph to mph
+FT_MULTIPLIER = 3.28084 #when converting meters to feet
 
 GPS_STATUSES = { #dict key value pair of possible gps status from NMEA TPV object
     0: 'Unknown',
@@ -51,16 +52,16 @@ def formatDecimalPlaces(dec, numPlaces):
     formatPlaces = "{:." + str(numPlaces) + "f}"
     return formatPlaces.format(dec)
 
-def createLogMessage(logType, sensorType, ex, args):
+def createLogMessage(logType, sensor, description, detailedDescription):
     now = datetime.datetime.now()
-    timeStamp = "%d:%d:%d" % (now.hour, now.minute, now.second)
+    timestamp = "%d:%d:%d" % (now.hour, now.minute, now.second)
             
     return {
         'logType': logType,
-        'sensor' : sensorType,
-        'exType' : ex, #pass empty string if not exception
-        'args' : args,
-        'timeStamp': timeStamp
+        'sensor' : SENSOR_TYPE,
+        'exType' : description,
+        'args' : detailedDescription,
+        'timeStamp': timestamp
     }
 
 def emitGpsData():
@@ -97,6 +98,10 @@ def emitGpsData():
 
 @sio.event
 def connect():
-    print("Gps connected to node server!")
+    
+    connectedLog = createLogMessage(INFO, SENSOR_TYPE, 'Connection', 'Established')
+    print(connectedLog)
+    sio.emit('log', json.dumps(connectedLog))
+    
     emitGpsData()
        

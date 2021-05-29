@@ -2,12 +2,16 @@ import time
 import socketio
 import json
 import datetime
+import math
 import board
 import adafruit_bno055
  
 SENSOR_TYPE = 'IMU'
 ERROR = 'ERR'
-POLL_INTERVAL = .0333333
+INFO = 'INFO'
+POLL_INTERVAL = .0333333 #~30hz
+
+GRAVITY = 9.80665
  
 i2c = board.I2C()
 sensor = adafruit_bno055.BNO055_I2C(i2c)
@@ -15,6 +19,7 @@ sensor = adafruit_bno055.BNO055_I2C(i2c)
 last_val = 0xFFFF
 
 sio = None
+
 
 numTries = 1
 while True: #loop until a connection is made with the server instead of immediately exiting
@@ -30,16 +35,16 @@ while True: #loop until a connection is made with the server instead of immediat
             
         continue
 
-def createLogMessage(logType, sensorType, ex, args):
+def createLogMessage(logType, sensor, description, detailedDescription):
     now = datetime.datetime.now()
-    timeStamp = "%d:%d:%d" % (now.hour, now.minute, now.second)
+    timestamp = "%d:%d:%d" % (now.hour, now.minute, now.second)
             
     return {
         'logType': logType,
-        'sensor' : sensorType,
-        'exType' : ex, #pass empty string if not exception
-        'args' : args,
-        'timeStamp': timeStamp
+        'sensor' : SENSOR_TYPE,
+        'exType' : description,
+        'args' : detailedDescription,
+        'timeStamp': timestamp
     }
  
  
@@ -72,6 +77,7 @@ def emitImuData():
                 "accelX": xA,
                 "accelY": yA,
                 "accelZ": zA,
+                "gForce": math.sqrt((xA * xA) + (yA * yA) + (zA * zA)) / GRAVITY,
                 "linAccelX": xL,
                 "linAccelY": yL,
                 "linAccelZ": zL,
@@ -88,16 +94,15 @@ def emitImuData():
                 "calAccel": accel,
                 "calMag": mag,
             }
-            if (roll is not None):
-                #print(data)
-                sio.emit('imuData', json.dumps(data))
+            
+            sio.emit('imuData', json.dumps(data))
             
         except Exception as ex: #logs any errors encountered during reading of gps. Also allows program to pick back up if node server connection is lost
                 
                 errorLog = createLogMessage(ERROR, SENSOR_TYPE, type(ex).__name__, ex.args)
                 print(errorLog)
                 sio.emit('log', json.dumps(errorLog)) #will only work if exception is unrelated to node server connection
-                i2c = board.I2C()
+                i2c = board.I2C() #try to reconnect to BNO055 sensor
                 sensor = adafruit_bno055.BNO055_I2C(i2c)
 
                 continue
@@ -106,5 +111,9 @@ def emitImuData():
 
 @sio.event
 def connect():
-    print("IMU connected to node server!")
+    
+    connectedLog = createLogMessage(INFO, SENSOR_TYPE, 'Connection', 'Established')
+    print(connectedLog)
+    sio.emit('log', json.dumps(connectedLog))
+    
     emitImuData()

@@ -11,6 +11,7 @@ from adafruit_pm25.i2c import PM25_I2C
 reset_pin = None
 SENSOR_TYPE = 'AIR'
 ERROR = 'ERR'
+INFO = 'INFO'
 
 DELAY = 1 #sensor polling interval in seconds. Max polling rate 1s for PMSA003I 
 
@@ -36,15 +37,15 @@ while True: #loop until a connection is made with the server instead of immediat
             
         continue
 
-def createLogMessage(ex, logType, sensor):
+def createLogMessage(logType, sensor, description, detailedDescription):
     now = datetime.datetime.now()
     timestamp = "%d:%d:%d" % (now.hour, now.minute, now.second)
             
     return {
-        'logType': ERROR,
+        'logType': logType,
         'sensor' : SENSOR_TYPE,
-        'exType' : type(ex).__name__,
-        'args' : ex.args,
+        'exType' : description,
+        'args' : detailedDescription,
         'timeStamp': timestamp
     }
 
@@ -67,7 +68,7 @@ def emitAirSensorData():
 
             sio.emit('airQualityData', json.dumps(data))
         except Exception as ex:
-            errorLog = createLogMessage(ex, ERROR, SENSOR_TYPE)
+            errorLog = createLogMessage(ERROR, SENSOR_TYPE, type(ex).__name__, ex.args)
             print(errorLog)
             sio.emit('log', json.dumps(errorLog))
             continue
@@ -75,6 +76,9 @@ def emitAirSensorData():
 
 @sio.event
 def connect():
-    print("Air sensor connected to node server!")
+    connectedLog = createLogMessage(INFO, SENSOR_TYPE, 'Connection', 'Established')
+    print(connectedLog)
+    sio.emit('log', json.dumps(connectedLog))
+    
     emitAirSensorData()
 
