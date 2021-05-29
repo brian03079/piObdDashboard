@@ -67,24 +67,40 @@
             <div class="container-fluid  h-100">
                 <div class="row">
                     <div class="col col-sm-3">
-                        <h4 class="bold">Pitch&deg;</h4>
+                        <h4 class="bold">Accel:</h4>
+                    </div>
+                    <div class="col col-sm-3">
+                        <h4 id="accelField">--</h4>
+                    </div>
+                    <div class="col col-sm-3">
+                        <h4 class="bold">Gs:</h4>
                     </div>
                     <div class="col col-sm-2">
+                        <h4 id="gForceField">--</h4>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col col-sm-3">
+                        <h4 class="bold">Pitch&deg;</h4>
+                    </div>
+                    <div class="col col-sm-3">
                         <h4 id="pitch">--</h4>
                     </div>
                     <div class="col col-sm-3">
                         <h4 class="bold">Roll&deg;</h4>
                     </div>
+                        
+                    <div class="col col-sm-2">
                         <h4 id="roll">--</h4>
-                    <div class="col hidden col-sm-2">
-                        <div class="bttn" id="straighten">S</div>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col col-sm-3">Accel:</div>
-                    <div id="accelField" class="col col-sm-2">--</div>
-                    <div class="col col-sm-3">Gs:</div>
-                    <div id="gForceField" class="col col-sm-2">--</div>
+                    <div class="col-sm">
+                        <canvas id="pitchView" width="200" height="200"></canvas> <!--width and height of canvas must be set manually here to avoid coordinate scaling issue of using CSS -->
+                    </div>
+                    <div class="col-sm">
+                        <canvas id="rollView" width="200" height="200"></canvas>
+                    </div>
                 </div>
               </div>
         </div>
@@ -209,7 +225,7 @@
         });
         
         socket.on("imuData", function(msg) {
-            updateSensorData(msg);
+            updateBnoData(msg);
         });
         
         //set the air quality bars to flash if they are red
@@ -302,23 +318,77 @@
             //$("#headingField").text(data["heading"]);
         }
         
-        function updateSensorData(msg) {
+        function updateBnoData(msg) {
             var bnoData = $.parseJSON(msg);
             var pitch = (bnoData.pitch - 90).toFixed(1); // subtract 90 since sensor is mounted on its side (bottom of sensor facing ahead, top facing towards you, "BNO055" PCB label on left side
             var roll = bnoData.roll.toFixed(1);
             var forwardAccel = parseFloat(bnoData.linAccelZ).toFixed(2);
             var gForce = parseFloat(bnoData.gForce).toFixed(2);
             
+            //getting the canvas elements seem to be only supported using plain JS, not jquery
+            updateView(document.getElementById("pitchView"), -1 * pitch, false); //multiply angle by -1 to adjust for the way the sensor is oriented
+            updateView(document.getElementById("rollView"), roll, true);
+                   
             $('#heading').text(bnoData.heading);
             $('#roll').text(roll);
             $('#pitch').text(pitch);
             $('#accelField').text(forwardAccel);
             $('#gForceField').text(gForce);
+        }
+        
+        //initialize the canvases by drawing horizontal reference lines through the center
+        function initCanvases(canvas) {
+                var ctx = canvas.getContext("2d");
+                ctx.clearRect(0, 0, 200, 200);
+                
+                ctx.strokeStyle = DEFAULT_COLOR;
+                ctx.lineWidth = 2;
+                
+                ctx.beginPath();
+                
+                ctx.moveTo(0, 100);
+                ctx.lineTo(200, 100);
+                ctx.stroke();
+                
+                //create the 'tick' marks on the ends of the line we just drew
+                ctx.moveTo(0, 95);
+                ctx.lineTo(0, 105);
+                ctx.stroke();
+                ctx.moveTo(200, 95);
+                ctx.lineTo(200, 105);
+                ctx.stroke();
+                
+        }
+        
+        function updateView(canvas, angle, mirrorAngle) {
+            var ctx = canvas.getContext("2d");
+            ctx.strokeStyle = 'red';
+            var length =  100;
+              
+            initCanvases(canvas);
             
-            $('#calSys').text(bnoData.calSys);
-            $('#calGyro').text(bnoData.calGyro);
-            $('#calAccel').text(bnoData.calAccel);
-            $('#calMag').text(bnoData.calMag);
+            //starting coordinate is center of canvas
+            var x1 = 100;
+            var y1 = 100;
+            
+            //initial line from origin
+            x2 = x1 + Math.cos(Math.PI * angle / 180) * length;
+            y2 = y1 + Math.sin(Math.PI * angle / 180) * length;
+            
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+            
+            //'mirror' the line. Helpful for visualizing roll of car (side to side)
+            if (mirrorAngle) {
+                var x3 = x1 + Math.cos(Math.PI * (angle - 180) / 180) * length;
+                var y3 = y1 + Math.sin(Math.PI * (angle - 180) / 180) * length;
+                
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x3, y3);
+                ctx.stroke();
+            }
         }
     
     });
