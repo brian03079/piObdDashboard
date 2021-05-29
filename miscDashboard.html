@@ -326,7 +326,7 @@
             var gForce = parseFloat(bnoData.gForce).toFixed(2);
             
             //getting the canvas elements seem to be only supported using plain JS, not jquery
-            updateView(document.getElementById("pitchView"), -1 * pitch, false); //multiply angle by -1 to adjust for the way the sensor is oriented
+            updateView(document.getElementById("pitchView"), -1 * pitch, true); //multiply angle by -1 to adjust for the way the sensor is oriented
             updateView(document.getElementById("rollView"), roll, true);
                    
             $('#heading').text(bnoData.heading);
@@ -341,10 +341,11 @@
                 var ctx = canvas.getContext("2d");
                 ctx.clearRect(0, 0, 200, 200);
                 
+                ctx.beginPath();
+                
+                ctx.setLineDash([10, 10]); //set to dashed line
                 ctx.strokeStyle = DEFAULT_COLOR;
                 ctx.lineWidth = 2;
-                
-                ctx.beginPath();
                 
                 ctx.moveTo(0, 100);
                 ctx.lineTo(200, 100);
@@ -360,9 +361,8 @@
                 
         }
         
-        function updateView(canvas, angle, mirrorAngle) {
+        function updateView(canvas, angle, mirrorAngle, warningAngle) {
             var ctx = canvas.getContext("2d");
-            ctx.strokeStyle = 'red';
             var length =  100;
               
             initCanvases(canvas);
@@ -376,6 +376,12 @@
             y2 = y1 + Math.sin(Math.PI * angle / 180) * length;
             
             ctx.beginPath();
+            ctx.setLineDash([]); // set to solid line
+            if (Math.abs(angle) > warningAngle) {
+                ctx.strokeStyle = FAIR_AIR_COLOR;
+            } else {
+                ctx.strokeStyle = DEFAULT_COLOR;
+            }
             ctx.moveTo(x1, y1);
             ctx.lineTo(x2, y2);
             ctx.stroke();
