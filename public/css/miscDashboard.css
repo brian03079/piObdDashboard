@@ -8,7 +8,19 @@ body {
   padding-bottom: .2em;
   padding-top: .5em;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  font-size: 1.3em;
+  font-size: 1.2em;
+}
+
+.car-side {
+  max-width: 60%;
+  max-height: 100%;
+  height: auto;
+}
+
+.car-front {
+  max-width: 30%;
+  max-height: 100%;
+  height: auto;
 }
 
 .bttn {

@@ -4,12 +4,6 @@
         <script src="/js/jquery.min.js"></script>
         <script src="/js/plotly-latest.min.js"></script>
         <script src="/js/bootstrap.min.js"></script>
-        <script src="/js/imuJS/three.min.js"></script>
-        <script src="/js/imuJS/DDSLoader.js"></script>
-        <script src="/js/imuJS/MTLLoader.js"></script>
-        <script src="/js/imuJS/OBJMTLLoader.js"></script>
-        <script src="/js/imuJS/OBJLoader.js"></script>
-        <script src="/js/imuJS/STLLoader.js"></script>
               
         <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css" />
         <link rel="stylesheet" type="text/css" href="/css/bootstrap-theme.min.css" />
@@ -70,7 +64,7 @@
         </div>
         <div id="imuDIV" class="divider">
 
-            <div class="container-fluid">
+            <div class="container-fluid  h-100">
                 <div class="row">
                     <div class="col col-sm-3">
                         <h4 class="bold">Pitch&deg;</h4>
@@ -82,13 +76,15 @@
                         <h4 class="bold">Roll&deg;</h4>
                     </div>
                         <h4 id="roll">--</h4>
-                    <div class="col col-sm-2">
+                    <div class="col hidden col-sm-2">
                         <div class="bttn" id="straighten">S</div>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-sm-12" id="renderer">
-                    </div>
+                    <div class="col col-sm-3">Accel:</div>
+                    <div id="accelField" class="col col-sm-2">--</div>
+                    <div class="col col-sm-3">Gs:</div>
+                    <div id="gForceField" class="col col-sm-2">--</div>
                 </div>
               </div>
         </div>
@@ -153,30 +149,19 @@
         <div id="miscDataDiv" class="divider">
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col col-sm-3">Accel:</div>
-                    <div class="col col-sm-2">--</div>
-                    <div class="col col-sm-3">Gs:</div>
-                    <div class="col col-sm-2">--</div>
-                </div>
-                <div class="row">
                     <div class="col col-sm-3" id="cpuTempHeader">CPU &deg;F:</div>
                     <div class="col col-sm-2" id="cpuTempField">--</div>
                 </div>
                 <div class="row">
                     <div class="col col-sm-3" id="logsHeader">Logs:</div>
                 </div>
-                <div class="logContainer">
-                    <div class="row log pad-left"><div>[22:32:31] [ERR]: AIR - RuntimeError - Invalid PM2.5 checksum</div></div>
+                <div id="logContainer" class="logContainer">
+                    <div id="logPlaceHolder" class="row log pad-left"></div>
                 </div>
             </div>
         </div>
     </body>
 </html>
-
-<script>
-
-    
-</script>
 
 <script>
     var DEFAULT_COLOR = '#00ba00'
@@ -204,7 +189,7 @@
     
     $(document).ready(() => {
         
-        /*begin code to setup listeners for data*/
+        /*Code to setup listeners for data*/
         
         var socket = io();
         if (socket != null) {
@@ -240,147 +225,13 @@
             }
         }, 1000); //in ms
         
-        /*begin code for IMU webgl render section
-        //a lot of the webgl three js code is based on 
-        //https://github.com/adafruit/Adafruit_CircuitPython_BNO055.git
-        */
-        
-        var meshFloor = new THREE.Mesh(
-            new THREE.PlaneGeometry(100, 50, 15, 15),
-            new THREE.MeshBasicMaterial({
-                color: DEFAULT_COLOR,
-                wireframe: true
-            })
-        );
-        meshFloor.rotation.x -= Math.PI / 2;
 
-        // Set size of the WebGL renderer scene.
-        var sceneWidth = $("#imuDIV").width();
-        var sceneHeight = $("#imuDIV").height() - 50;
-
-        var models = [{
-            name: 'Miata',
-            load: function(model) {
-                stlLoader.load(
-                    'objects/miata.stl',
-                    function(geometry) {
-                        // Regenerate normals because they aren't loaded properly.
-                        geometry.computeFaceNormals();
-                        geometry.computeVertexNormals();
-                        // Load the model and build mesh.
-                        model.model = new THREE.Mesh(geometry, material);
-                        // Rotate, scale, and move so the cat is facing out the screen.
-                        model.model.rotation.x = -90 * (Math.PI / 180.0);
-                        model.model.rotation.z = -180 * (Math.PI / 180.0);
-                        model.model.scale.set(5, 5, 5);
-                        model.model.position.y = 1.5;
-                    }
-                );
-            }
-        }];
-
-        // Global state.
-        var bnoData = null;
-        var offset = null;
-        var orientation = null;
-        var objMTLLoader = new THREE.OBJMTLLoader();
-        var stlLoader = new THREE.STLLoader();
-        var currentModel = null;
-
-        // Setup Three.js scene and camera.
-        var scene = new THREE.Scene();
-        var camera = new THREE.PerspectiveCamera(45, sceneWidth / sceneHeight, 1, 1000);
-
-
-        // Setup Three.js WebGL renderer and add it to the page.
-        var renderer = new THREE.WebGLRenderer({
-            antialias: true
-        });
-        renderer.setSize(sceneWidth, sceneHeight);
-        renderer.setClearColor(0xff0000, 0);
-        $('#renderer').append(renderer.domElement);
-        $('#renderer canvas').addClass('center-block'); // Center the renderer.
-
-        //try to center car and zoom out to appropriate distance 
-        camera.position.set(0, 6, 20);
-
-
-        // Create default green material for the model
-        var material = new THREE.MeshPhongMaterial({
-            color: DEFAULT_COLOR,
-            wireframe: false
-        });
-
-        // Setup 3 point lighting with a green point light in upper left
-        // and right corners, plus a bit of backlight from the rear forward.
-        var pointLight1 = new THREE.PointLight('white', 0.6);
-        pointLight1.position.set(40, 15, 40);
-        scene.add(pointLight1);
-        var pointLight2 = new THREE.PointLight('white', 0.6);
-        pointLight2.position.set(-40, 15, 40);
-        scene.add(pointLight2);
-        var backLight = new THREE.DirectionalLight('white', 0.3);
-        backLight.position.set(0, -0.25, -1);
-        scene.add(backLight);
-
-        // Create a couple groups to apply rotations to the 3D model at different
-        // stages.  The outer group called offset is set to the reverse rotation
-        // of the current BNO orientation when the 'Straighten' button is clicked.
-        // This will force the model to center itself staring directly out of
-        // the screen.  The inner group called orientation will be rotated with
-        // the current BNO sensor orientation and cause the model to rotate.
-        offset = new THREE.Group();
-        orientation = new THREE.Group();
-        offset.add(orientation);
-        scene.add(offset);
-        scene.add(meshFloor);
-
-        // Main rendering function.
-        function render() {
-            requestAnimationFrame(render);
-            // Switch to the first model once it's loaded.
-            if (currentModel === null) {
-                if (models[0].hasOwnProperty('model')) {
-                    currentModel = 0;
-                    orientation.add(models[0].model);
-                }
-            }
-            // Update the orientation with the last BNO sensor reading quaternion.
-            if (bnoData !== null) {
-                orientation.quaternion.set(bnoData.quatY, 0, bnoData.quatZ, bnoData.quatW); // note the swapping of x, y in args for correct orientation
-            }
-            renderer.render(scene, camera);
-        }
-
-        render();
-
-        //zeros/resets the orientation of the car model
-        $('#straighten').click(function() {
-            // Get the current orientation of the BNO sensor and compute its
-            // conjugate or reverse rotation and apply it to the offset group.
-            // This will reset the 3D model so that it faces directly forward based
-            // on the current BNO sensor orientation.
-            var currentQuat = new THREE.Quaternion(bnoData.quatY, 0, bnoData.quatZ, bnoData.quatW); // note the swapping of x, y in args for correct orientation
-            offset.quaternion.copy(currentQuat.conjugate());
-        });
-
-        // Populate 3D models and load 
-        $.each(models, function(index, model) {
-            model.load(model);
-        });
-
-
-        //begin code for calling code to update all data on the page
+        //Code for calling code to update all data on the page
         
         function updateLogs(msg) {
             var data = $.parseJSON(msg);
-            var tbody = $("#logTable").children("tbody");
-            var table = tbody.length ? tbody : $("#logTable");
-            
-            table.append('<div class="row log pad-left"><div>' + "[" + data['timeStamp'] + "] [" + data['logType'] + "]: " + data['sensor'] + " - " + data['exType'] + " - " + data['args'] + "</div></div>");
-
-            var objDiv = document.getElementById("logTable");
-            objDiv.scrollTop = objDiv.scrollHeight;
+            console.log(data);
+            $("#logPlaceHolder").after('<div class="row log pad-left"><div>' + "[" + data['timeStamp'] + "] [" + data['logType'] + "]: " + data['sensor'] + " - " + data['exType'] + " - " + data['args'] + "</div></div>");
         }
         
         function updateAirQualityBar(barTextField, bar, barContainer, numParticles, scalar) {
@@ -452,18 +303,22 @@
         }
         
         function updateSensorData(msg) {
-            var data = $.parseJSON(msg);
-            var pitch = data.roll.toFixed(1); //need to reverse pitch and roll for accurate orientation. Mismatch somewhere?
-            var roll = data.pitch.toFixed(1); //sensor is being layed on a flat surface
-            bnoData = data;
+            var bnoData = $.parseJSON(msg);
+            var pitch = (bnoData.pitch - 90).toFixed(1); // subtract 90 since sensor is mounted on its side (bottom of sensor facing ahead, top facing towards you, "BNO055" PCB label on left side
+            var roll = bnoData.roll.toFixed(1);
+            var forwardAccel = parseFloat(bnoData.linAccelZ).toFixed(2);
+            var gForce = parseFloat(bnoData.gForce).toFixed(2);
             
-            $('#heading').text(data.heading);
+            $('#heading').text(bnoData.heading);
             $('#roll').text(roll);
             $('#pitch').text(pitch);
-            $('#calSys').text(data.calSys);
-            $('#calGyro').text(data.calGyro);
-            $('#calAccel').text(data.calAccel);
-            $('#calMag').text(data.calMag);
+            $('#accelField').text(forwardAccel);
+            $('#gForceField').text(gForce);
+            
+            $('#calSys').text(bnoData.calSys);
+            $('#calGyro').text(bnoData.calGyro);
+            $('#calAccel').text(bnoData.calAccel);
+            $('#calMag').text(bnoData.calMag);
         }
     
     });
