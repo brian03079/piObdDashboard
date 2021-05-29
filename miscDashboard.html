@@ -180,7 +180,8 @@
 </html>
 
 <script>
-    var DEFAULT_COLOR = '#00ba00'
+    var DEFAULT_COLOR = '#00ba00';
+    var MAX_NUM_LOGS = 7;
     
     //Ceiling values are based on
     //https://www3.epa.gov/region1/airquality/pm-aq-standards.html
@@ -247,7 +248,13 @@
         function updateLogs(msg) {
             var data = $.parseJSON(msg);
             console.log(data);
+            
+            if ($('.log').length > MAX_NUM_LOGS) {
+                $('.log:last').remove();
+            }
+            
             $("#logPlaceHolder").after('<div class="row log pad-left"><div>' + "[" + data['timeStamp'] + "] [" + data['logType'] + "]: " + data['sensor'] + " - " + data['exType'] + " - " + data['args'] + "</div></div>");
+            
         }
         
         function updateAirQualityBar(barTextField, bar, barContainer, numParticles, scalar) {
