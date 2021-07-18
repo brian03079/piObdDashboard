@@ -43,7 +43,7 @@ while True: #loop until a connection is made with the server instead of immediat
         break
     except Exception as ex:
         numTries += 1
-        print("Unable to connect to node server, retrying attempt {0}".format(numTries))
+        print("GPS app unable to connect to node server, retrying attempt {0}".format(numTries))
         time.sleep(1)
             
         continue
@@ -87,7 +87,7 @@ def emitGpsData():
                     'speedErr': formatDecimalPlaces((getattr(report,'eps',0.0) * MPH_MULTIPLIER), SPEED_DEC_PLACES),#Estimated speed error in meters per second. Certainty unknown.
                     'climbErr': getattr(report,'epc', 'nan') #Estimated climb error in meters per second. Certainty unknown.
                 }
-                print(data)
+                #print(data)
                 sio.emit('gpsData', json.dumps(data))
                 
         except Exception as ex: #logs any errors encountered during reading of gps. Also allows program to pick back up if node server connection is lost

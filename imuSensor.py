@@ -30,7 +30,7 @@ while True: #loop until a connection is made with the server instead of immediat
         break
     except Exception as ex:
         numTries += 1
-        print("Unable to connect to node server, retrying attempt {0}".format(numTries))
+        print("IMU app unable to connect to node server, retrying attempt {0}".format(numTries))
         time.sleep(1)
             
         continue
