@@ -24,18 +24,7 @@ sio = None
 
 
 numTries = 1
-while True: #loop until a connection is made with the server instead of immediately exiting
-    try:
-        sio = socketio.Client()
-        sio.connect('http://localhost:3000')
-        
-        break
-    except Exception as ex:
-        numTries += 1
-        print("Unable to connect to node server, retrying attempt {0}".format(numTries))
-        time.sleep(1)
-            
-        continue
+
 
 def createLogMessage(logType, sensor, description, detailedDescription):
     now = datetime.datetime.now()
@@ -73,6 +62,20 @@ def emitAirSensorData():
             sio.emit('log', json.dumps(errorLog))
             continue
 
+while True: #loop until a connection is made with the server instead of immediately exiting
+    try:
+        sio = socketio.Client()
+        sio.connect('http://localhost:3000')
+        emitAirSensorData() #temp workaround. Originally not needed. Seems to be issue with nodejs socketio version not sending connect packet to trigger connect() event
+        break
+        
+    except Exception as ex:
+        numTries += 1
+        print("Unable to connect to node server, retrying attempt {0}".format(numTries))
+        time.sleep(1)
+            
+        continue
+
 
 @sio.event
 def connect():
@@ -81,4 +84,3 @@ def connect():
     sio.emit('log', json.dumps(connectedLog))
     
     emitAirSensorData()
-

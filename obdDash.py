@@ -36,22 +36,7 @@ def createLogMessage(ex, logType, sensor):
 
 
 numTries = 1
-while True: #loop until a connection is made with the server instead of immediately exiting
-    try:
-        connection = obd.OBD()
-        print("OBD connection established!")
-        
-        sio = socketio.Client()
-        sio.connect('http://localhost:3000')
-        break
-        
-    except Exception as ex:
-        numTries += 1
-        print("Unable to connect to node server, retrying attempt {0}".format(numTries))
-        time.sleep(1)
-            
-        continue
-        
+
 def emitDtcCodes():
     
     global dtcCodesChanged
@@ -113,6 +98,24 @@ def emitTelemetry():
             print(errorLog)
             sio.emit('log', json.dumps(errorLog)) #will only work if exception is unrelated to node server connection
             continue
+
+
+while True: #loop until a connection is made with the server instead of immediately exiting
+    try:
+        connection = obd.OBD()
+        print("OBD connection established!")
+        
+        sio = socketio.Client()
+        sio.connect('http://localhost:3000')
+        emitTelemetry()
+        
+    except Exception as ex:
+        numTries += 1
+        print("Unable to connect to node server, retrying attempt {0}".format(numTries))
+        time.sleep(1)
+            
+        continue
+        
 
 
 @sio.event

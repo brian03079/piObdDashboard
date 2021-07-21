@@ -1,11 +1,11 @@
 import time
-import socketio
 import json
 import datetime
 import math
 import board
 import adafruit_bno055
- 
+import socketio
+
 SENSOR_TYPE = 'IMU'
 ERROR = 'ERR'
 INFO = 'INFO'
@@ -22,18 +22,6 @@ sio = None
 
 
 numTries = 1
-while True: #loop until a connection is made with the server instead of immediately exiting
-    try:
-        sio = socketio.Client()
-        sio.connect('http://localhost:3000')
-        
-        break
-    except Exception as ex:
-        numTries += 1
-        print("IMU app unable to connect to node server, retrying attempt {0}".format(numTries))
-        time.sleep(1)
-            
-        continue
 
 def createLogMessage(logType, sensor, description, detailedDescription):
     now = datetime.datetime.now()
@@ -46,8 +34,8 @@ def createLogMessage(logType, sensor, description, detailedDescription):
         'args' : detailedDescription,
         'timeStamp': timestamp
     }
- 
- 
+
+
 def temperature():
     global last_val  # pylint: disable=global-statement
     result = sensor.temperature
@@ -108,7 +96,23 @@ def emitImuData():
                 continue
      
         time.sleep(POLL_INTERVAL)
+        
+while True: #loop until a connection is made with the server instead of immediately exiting
+    try:
+        sio = socketio.Client()
+        sio.connect('http://localhost:3000')
+        emitImuData() #temp workaround. Originally not needed. Seems to be issue with nodejs socketio version not sending connect packet to trigger connect() event
+        break;
 
+    except Exception as ex:
+        numTries += 1
+        print("IMU app unable to connect to node server, retrying attempt {0}".format(numTries))
+        errorLog = createLogMessage(ERROR, SENSOR_TYPE, type(ex).__name__, ex.args)
+        print(errorLog)
+        time.sleep(1)
+            
+        continue
+        
 @sio.event
 def connect():
     
@@ -117,3 +121,7 @@ def connect():
     sio.emit('log', json.dumps(connectedLog))
     
     emitImuData()
+
+
+
+
