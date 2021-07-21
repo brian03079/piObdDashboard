@@ -2,9 +2,7 @@
 
 import RPi.GPIO as GPIO
 import time
-import threading
 import os
-import subprocess
 import socketio
 import json
 import datetime
@@ -28,7 +26,6 @@ def toggleCameraPreview(channel):
 def shutdown(channel):
 
     print("Shutting Down")
-    time.sleep(5)
     os.system("sudo shutdown -h now")
 
 def restartApps(channel):
