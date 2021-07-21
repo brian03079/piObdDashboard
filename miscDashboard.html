@@ -165,8 +165,10 @@
         <div id="miscDataDiv" class="divider">
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col col-sm-3" id="cpuTempHeader">CPU &deg;F:</div>
+                    <div class="col col-sm-3" id="cpuTempHeader">CPU &deg;C:</div>
                     <div class="col col-sm-2" id="cpuTempField">--</div>
+                    <div class="col col-sm-3" id="gpuTempHeader">GPU &deg;C:</div>
+                    <div class="col col-sm-2" id="gpuTempField">--</div>
                 </div>
                 <div class="row">
                     <div class="col col-sm-3" id="logsHeader">Logs:</div>
@@ -228,6 +230,10 @@
         socket.on("imuData", function(msg) {
             updateBnoData(msg);
         });
+        
+        socket.on("sysTempData", function(msg) {
+			updateSysTempData(msg);
+		});
         
         //set the air quality bars to flash if they are red
         setInterval(() => {
@@ -323,6 +329,12 @@
             $("#climbField").text(data["climb"]);
             $("#climbErrField").text(data["climbErr"]);
             //$("#headingField").text(data["heading"]);
+        }
+        
+        function updateSysTempData(msg) {
+            var data = $.parseJSON(msg);
+            $("#cpuTempField").text(data["cpuTemp"].toFixed(1));
+            $("#gpuTempField").text(data["gpuTemp"]); //already formatted to one decimal place
         }
         
         function updateBnoData(msg) {
