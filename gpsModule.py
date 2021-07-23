@@ -4,11 +4,14 @@ import json
 import datetime
 from gps import *
 
+import obdUtils
+
 #see https://gpsd.gitlab.io/gpsd/gpsd_json.html for more details on getting data from gpsd
 
 SENSOR_TYPE = 'GPS'
 ERROR = 'ERR'
 INFO = 'INFO'
+
 LATITUDE_DEC_PLACES = 5
 LONGITUDE_DEC_PLACES = 5
 SPEED_DEC_PLACES = 2
@@ -36,23 +39,6 @@ sio = None
 
 numTries = 1
 
-
-def formatDecimalPlaces(dec, numPlaces):
-    formatPlaces = "{:." + str(numPlaces) + "f}"
-    return formatPlaces.format(dec)
-
-def createLogMessage(logType, sensor, description, detailedDescription):
-    now = datetime.datetime.now()
-    timestamp = "%d:%d:%d" % (now.hour, now.minute, now.second)
-            
-    return {
-        'logType': logType,
-        'sensor' : SENSOR_TYPE,
-        'exType' : description,
-        'args' : detailedDescription,
-        'timeStamp': timestamp
-    }
-
 def emitGpsData():
     while True:
         time.sleep(DELAY)
@@ -63,24 +49,24 @@ def emitGpsData():
             if report['class'] == 'TPV': #time-position-velocity report object
                 data = {
                     'fixType': GPS_STATUSES[getattr(report,'status','')],
-                    'latitude': formatDecimalPlaces(getattr(report,'lat',0.0), LATITUDE_DEC_PLACES),
-                    'longitude': formatDecimalPlaces(getattr(report,'lon',0.0), LONGITUDE_DEC_PLACES),
+                    'latitude': obdUtils.formatDecimalPlaces(getattr(report,'lat',0.0), LATITUDE_DEC_PLACES),
+                    'longitude': obdUtils.formatDecimalPlaces(getattr(report,'lon',0.0), LONGITUDE_DEC_PLACES),
                     'time': getattr(report,'time',''), #Time/date stamp in ISO8601 format, UTC. May have a fractional part of up to .001sec precision. May be absent if the mode is not 2D or 3D.
                     'altitude': getattr(report,'alt','nan'),#Altitude, height above ellipsoid, in meters. Probably WGS84.
-                    'speed': formatDecimalPlaces((getattr(report,'speed',0.0) * MPH_MULTIPLIER), SPEED_DEC_PLACES), #mph converted from meters per second
+                    'speed': obdUtils.formatDecimalPlaces((getattr(report,'speed',0.0) * MPH_MULTIPLIER), SPEED_DEC_PLACES), #mph converted from meters per second
                     'climb': getattr(report,'climb','nan'), #Climb (positive) or sink (negative) rate, meters per second.
                     'latitudeErr': getattr(report,'epy','nan'), #Latitude error estimate in meters. Certainty unknown.
                     'longitudeErr': getattr(report,'epx','nan'), #Longitude error estimate in meters. Certainty unknown.
                     'timeErr': getattr(report,'ept','nan'), #Estimated time stamp error in seconds. Certainty unknown.
                     'altitudeErr': getattr(report,'epv','nan'), #Estimated vertical error in meters. Certainty unknown.
-                    'speedErr': formatDecimalPlaces((getattr(report,'eps',0.0) * MPH_MULTIPLIER), SPEED_DEC_PLACES),#Estimated speed error in meters per second. Certainty unknown.
+                    'speedErr': obdUtils.formatDecimalPlaces((getattr(report,'eps',0.0) * MPH_MULTIPLIER), SPEED_DEC_PLACES),#Estimated speed error in meters per second. Certainty unknown.
                     'climbErr': getattr(report,'epc', 'nan') #Estimated climb error in meters per second. Certainty unknown.
                 }
                 #print(data)
                 sio.emit('gpsData', json.dumps(data))
                 
         except Exception as ex: #logs any errors encountered during reading of gps. Also allows program to pick back up if node server connection is lost
-            errorLog = createLogMessage(ERROR, SENSOR_TYPE, type(ex).__name__, ex.args)
+            errorLog = obdUtils.createLogMessage(ERROR, SENSOR_TYPE, type(ex).__name__, ex.args)
             print(errorLog)
             sio.emit('log', json.dumps(errorLog)) #will only work if exception is unrelated to node server connection
             continue
@@ -105,7 +91,7 @@ while True: #loop until a connection is made with the server instead of immediat
 @sio.event
 def connect():
     
-    connectedLog = createLogMessage(INFO, SENSOR_TYPE, 'Connection', 'Established')
+    connectedLog = obdUtils.createLogMessage(INFO, SENSOR_TYPE, 'Connection', 'Established')
     print(connectedLog)
     sio.emit('log', json.dumps(connectedLog))
     

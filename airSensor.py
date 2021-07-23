@@ -7,8 +7,9 @@ import busio
 from digitalio import DigitalInOut, Direction, Pull
 from adafruit_pm25.i2c import PM25_I2C
  
+import obdUtils
  
-reset_pin = None
+RESET_PIN = None
 SENSOR_TYPE = 'AIR'
 ERROR = 'ERR'
 INFO = 'INFO'
@@ -19,24 +20,11 @@ DELAY = 1 #sensor polling interval in seconds. Max polling rate 1s for PMSA003I
 # Create library object, use 'slow' 100KHz frequency!
 i2c = busio.I2C(board.SCL, board.SDA, frequency=100000)
 # Connect to a PM2.5 sensor over I2C
-pm25 = PM25_I2C(i2c, reset_pin)
+pm25 = PM25_I2C(i2c, RESET_PIN)
+
 sio = None
-
-
 numTries = 1
 
-
-def createLogMessage(logType, sensor, description, detailedDescription):
-    now = datetime.datetime.now()
-    timestamp = "%d:%d:%d" % (now.hour, now.minute, now.second)
-            
-    return {
-        'logType': logType,
-        'sensor' : SENSOR_TYPE,
-        'exType' : description,
-        'args' : detailedDescription,
-        'timeStamp': timestamp
-    }
 
 def emitAirSensorData():
     while True:
@@ -57,7 +45,7 @@ def emitAirSensorData():
 
             sio.emit('airQualityData', json.dumps(data))
         except Exception as ex:
-            errorLog = createLogMessage(ERROR, SENSOR_TYPE, type(ex).__name__, ex.args)
+            errorLog = obdUtils.createLogMessage(ERROR, SENSOR_TYPE, type(ex).__name__, ex.args)
             print(errorLog)
             sio.emit('log', json.dumps(errorLog))
             continue
@@ -79,7 +67,7 @@ while True: #loop until a connection is made with the server instead of immediat
 
 @sio.event
 def connect():
-    connectedLog = createLogMessage(INFO, SENSOR_TYPE, 'Connection', 'Established')
+    connectedLog = obdUtils.createLogMessage(INFO, SENSOR_TYPE, 'Connection', 'Established')
     print(connectedLog)
     sio.emit('log', json.dumps(connectedLog))
     
