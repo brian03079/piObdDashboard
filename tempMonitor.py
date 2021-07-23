@@ -1,11 +1,12 @@
 import socketio
 import time
-import subprocess
 import datetime
 import adafruit_dht
 import board
 import json
 import re
+
+import obdUtils
 
 SENSOR_TYPE = 'TEMP'
 ERROR = 'ERR'
@@ -20,28 +21,10 @@ dhtSensor = adafruit_dht.DHT22(board.D23, use_pulseio=False)
 
 numTries = 1
 
-        
-def createLogMessage(logType, sensor, description, detailedDescription):
-    now = datetime.datetime.now()
-    timestamp = "%d:%d:%d" % (now.hour, now.minute, now.second)
-            
-    return {
-        'logType': logType,
-        'sensor' : SENSOR_TYPE,
-        'exType' : description,
-        'args' : detailedDescription,
-        'timeStamp': timestamp
-    }
-    
-def runSysCmd(cmdString):
-    proc = subprocess.Popen([cmdString], stdout=subprocess.PIPE, shell=True)
-    (out, err) = proc.communicate()
-    
-    return out
 
 def emitSysTemps():
-    cpuTemp = int(runSysCmd(CPU_TEMP_CMD)) / 1000 #note the required division
-    gpuTemp = re.search("\d+\.\d+", str(runSysCmd(GPU_TEMP_CMD))).group() #extract the decimal number using regular expression
+    cpuTemp = int(obdUtils.runSysCmd(CPU_TEMP_CMD)) / 1000 #note the required division
+    gpuTemp = re.search("\d+\.\d+", str(obdUtils.runSysCmd(GPU_TEMP_CMD))).group() #extract the decimal number using regular expression
        
     sysTempData = {
         "cpuTemp": cpuTemp,
@@ -70,7 +53,7 @@ def emitTempData():
                 sio.emit('cabinTempHumidity', json.dumps(data))
             
         except Exception as ex: #logs any errors encountered during reading of gps. Also allows program to pick back up if node server connection is lost
-            errorLog = createLogMessage(ERROR, SENSOR_TYPE, type(ex).__name__, ex.args)
+            errorLog = obdUtils.createLogMessage(ERROR, SENSOR_TYPE, type(ex).__name__, ex.args)
             print(errorLog)
             sio.emit('log', json.dumps(errorLog)) #will only work if exception is unrelated to node server connection
             continue
@@ -87,7 +70,7 @@ while True: #loop until a connection is made with the server instead of immediat
         break
         
     except Exception as ex:
-        errorLog = createLogMessage(ERROR, SENSOR_TYPE, type(ex).__name__, ex.args)
+        errorLog = obdUtils.createLogMessage(ERROR, SENSOR_TYPE, type(ex).__name__, ex.args)
         print(errorLog)
         numTries += 1
         print("Temp app unable to connect to node server, retrying attempt {0}".format(numTries))
@@ -100,7 +83,7 @@ while True: #loop until a connection is made with the server instead of immediat
 @sio.event
 def connect():
     
-    connectedLog = createLogMessage(INFO, SENSOR_TYPE, 'Connection', 'Established')
+    connectedLog = obdUtils.createLogMessage(INFO, SENSOR_TYPE, 'Connection', 'Established')
     print(connectedLog)
     sio.emit('log', json.dumps(connectedLog))
     
