@@ -7,7 +7,7 @@ import socketio
 import json
 import datetime
 
-POLL_INTERVAL = 1
+POLL_INTERVAL = 1 #seconds
  
 # Use the Broadcom SOC Pin numbers
 # Setup the pin with internal pullups enabled and pin in reading mode.
@@ -16,8 +16,10 @@ GPIO.setup(26, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(21, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(20, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
+sio = None
+numTries = 1
     
-#Send a simple ping that lets the web app know to toggle camera preview on/off
+#Send a simple ping that lets the dashcam python app know to toggle camera preview on/off
 def toggleCameraPreview(channel):
 
     print("Toggling camera preview...")
@@ -26,6 +28,7 @@ def toggleCameraPreview(channel):
 def shutdown(channel):
 
     print("Shutting Down")
+    time.sleep(5)
     os.system("sudo shutdown -h now")
 
 def restartApps(channel):
@@ -34,9 +37,34 @@ def restartApps(channel):
     os.system("/home/pi/piObdDashboard/restartApps.sh")
 
 # Add our function to execute when the button pressed event happens
-GPIO.add_event_detect(26, GPIO.FALLING, callback=restartApps, bouncetime=2000) #toggle camera preview on/off
+GPIO.add_event_detect(26, GPIO.FALLING, callback=toggleCameraPreview, bouncetime=2000) #toggle camera preview on/off
 GPIO.add_event_detect(21, GPIO.FALLING, callback=shutdown, bouncetime=2000)
 GPIO.add_event_detect(20, GPIO.FALLING, callback=restartApps, bouncetime=2000)
 
-while True:
-    time.sleep(POLL_INTERVAL)
+def sleepApp():
+    while True:
+        time.sleep(POLL_INTERVAL)
+    
+while True: #loop until a connection is made with the server instead of immediately exiting
+    try:
+        sio = socketio.Client()
+        sio.connect('http://localhost:3000')
+        sleepApp() #temp workaround. Originally not needed. Seems to be issue with nodejs socketio version not sending connect packet to trigger connect() event
+        break
+        
+    except Exception as ex:
+        numTries += 1
+        print("buttons app unable to connect to node server, retrying attempt {0}".format(numTries))
+        time.sleep(1)
+            
+        continue
+
+
+@sio.event
+def connect():
+    
+    connectedLog = obdUtils.createLogMessage(INFO, SENSOR_TYPE, 'Connection', 'Established')
+    print(connectedLog)
+    sio.emit('log', json.dumps(connectedLog))
+    
+    sleepApp()

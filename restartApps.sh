@@ -13,3 +13,4 @@ python3 tempMonitor.py &
 python3 imuSensor.py &
 python3 gpsModule.py &
 python3 airSensor.py &
+python3 buttons.py &
