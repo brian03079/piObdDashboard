@@ -4,7 +4,6 @@ import datetime
 import adafruit_dht
 import board
 import json
-import re
 
 import obdUtils
 
@@ -13,33 +12,15 @@ ERROR = 'ERR'
 INFO = 'INFO'
 METRIC_UNITS = False
 
-CPU_TEMP_CMD = 'cat /sys/class/thermal/thermal_zone0/temp' #Celcius. Needs to be divided by 1000
-GPU_TEMP_CMD = "vcgencmd measure_temp" #Celcius. Returned output is format of "temp=53.5'C"
-
-
 dhtSensor = adafruit_dht.DHT22(board.D23, use_pulseio=False)
 
 numTries = 1
-
-
-def emitSysTemps():
-    cpuTemp = int(obdUtils.runSysCmd(CPU_TEMP_CMD)) / 1000 #note the required division
-    gpuTemp = re.search("\d+\.\d+", str(obdUtils.runSysCmd(GPU_TEMP_CMD))).group() #extract the decimal number using regular expression
-       
-    sysTempData = {
-        "cpuTemp": cpuTemp,
-        "gpuTemp": gpuTemp
-    }
-        
-    print(sysTempData)
-    sio.emit('sysTempData', json.dumps(sysTempData))
 
 
 def emitTempData():
     while True:
         temp = 0.0
         humidity = 0.0
-        emitSysTemps()
 
         try:
             humidity = dhtSensor.humidity

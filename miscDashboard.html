@@ -165,10 +165,16 @@
         <div id="miscDataDiv" class="divider">
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col col-sm-3" id="cpuTempHeader">CPU &deg;C:</div>
+                    <div class="col col-sm-3" id="cpuTempHeader">CPU&deg;C:</div>
                     <div class="col col-sm-2" id="cpuTempField">--</div>
-                    <div class="col col-sm-3" id="gpuTempHeader">GPU &deg;C:</div>
+                    <div class="col col-sm-3" id="diskUsageHeader">Disk %:</div>
+                    <div class="col col-sm-2" id="diskUsageField">--</div>
+                </div>
+                <div class="row">
+                    <div class="col col-sm-3" id="gpuTempHeader">GPU&deg;C:</div>
                     <div class="col col-sm-2" id="gpuTempField">--</div>
+                    <div class="col col-sm-3" id="cpuUsageHeader">CPU %:</div>
+                    <div class="col col-sm-2" id="cpuUsageField">--</div>
                 </div>
                 <div class="row">
                     <div class="col col-sm-3" id="logsHeader">Logs:</div>
@@ -235,6 +241,10 @@
 			updateSysTempData(msg);
 		});
         
+        socket.on("sysInfoData", function(msg) {
+			updateSysInfoData(msg);
+		});
+        
         //set the air quality bars to flash if they are red
         setInterval(() => {
             for (i = 0; i < barGraphs.length; i++) {
@@ -253,7 +263,6 @@
         
         function updateLogs(msg) {
             var data = $.parseJSON(msg);
-            console.log(data);
             
             if ($('.log').length > MAX_NUM_LOGS) {
                 $('.log:last').remove();
@@ -331,10 +340,13 @@
             //$("#headingField").text(data["heading"]);
         }
         
-        function updateSysTempData(msg) {
+        
+        function updateSysInfoData(msg) {
             var data = $.parseJSON(msg);
-            $("#cpuTempField").text(data["cpuTemp"].toFixed(1));
-            $("#gpuTempField").text(data["gpuTemp"]); //already formatted to one decimal place
+            $("#cpuTempField").text(data["cpuTemp"]);
+            $("#gpuTempField").text(data["gpuTemp"].toFixed(1));
+            $("#diskUsageField").text(data["diskUsagePercent"]);
+            $("#cpuUsageField").text(data["cpuUsagePercent"]);
         }
         
         function updateBnoData(msg) {

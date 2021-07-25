@@ -56,6 +56,10 @@ io.on('connection', (socket) => {
     io.emit('imuData', msg);
   });
   
+  socket.on('sysInfoData', msg => {
+    io.emit('sysInfoData', msg);
+  });
+  
   socket.on('cameraPreviewToggle', msg => {
     io.emit('cameraPreviewToggle', msg);
   });

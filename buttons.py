@@ -7,6 +7,8 @@ import socketio
 import json
 import datetime
 
+import obdUtils
+
 POLL_INTERVAL = 1 #seconds
  
 # Use the Broadcom SOC Pin numbers
@@ -35,24 +37,56 @@ def restartApps(channel):
 
     print("Restarting apps...")
     os.system("/home/pi/piObdDashboard/restartApps.sh")
-
+    
+def pollSysInfo():
+    
+    diskUsage = obdUtils.getDiskUsage()
+    cpuUsage = obdUtils.getCpuUsage()
+    
+    gpuTemp = obdUtils.getGpuTemp()
+    cpuTemp = obdUtils.getCpuTemp()
+    
+    data = {
+        'diskUsagePercent': diskUsage,
+        'cpuUsagePercent': cpuUsage,
+        'gpuTemp': cpuTemp,
+        'cpuTemp': gpuTemp
+    }
+    
+    sio.emit('sysInfoData', json.dumps(data))
+    
+def emitSysTemps():
+    cpuTemp = int(obdUtils.runSysCmd(CPU_TEMP_CMD)) / 1000 #note the required division
+    gpuTemp = re.search("\d+\.\d+", str(obdUtils.runSysCmd(GPU_TEMP_CMD))).group() #extract the decimal number using regular expression
+       
+    sysTempData = {
+        "cpuTemp": cpuTemp,
+        "gpuTemp": gpuTemp
+    }
+        
+    print(sysTempData)
+    sio.emit('sysTempData', json.dumps(sysTempData))
+    
 # Add our function to execute when the button pressed event happens
 GPIO.add_event_detect(26, GPIO.FALLING, callback=toggleCameraPreview, bouncetime=2000) #toggle camera preview on/off
 GPIO.add_event_detect(21, GPIO.FALLING, callback=shutdown, bouncetime=2000)
 GPIO.add_event_detect(20, GPIO.FALLING, callback=restartApps, bouncetime=2000)
 
-def sleepApp():
+def startApp():
     while True:
+        pollSysInfo()
         time.sleep(POLL_INTERVAL)
     
 while True: #loop until a connection is made with the server instead of immediately exiting
     try:
         sio = socketio.Client()
         sio.connect('http://localhost:3000')
-        sleepApp() #temp workaround. Originally not needed. Seems to be issue with nodejs socketio version not sending connect packet to trigger connect() event
+        startApp() #temp workaround. Originally not needed. Seems to be issue with nodejs socketio version not sending connect packet to trigger connect() event
         break
         
     except Exception as ex:
+        errorLog = obdUtils.createLogMessage('asdf', 'asdf', type(ex).__name__, ex.args)
+        print(errorLog)
         numTries += 1
         print("buttons app unable to connect to node server, retrying attempt {0}".format(numTries))
         time.sleep(1)
@@ -67,4 +101,4 @@ def connect():
     print(connectedLog)
     sio.emit('log', json.dumps(connectedLog))
     
-    sleepApp()
+    startApp()
