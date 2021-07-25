@@ -12,6 +12,6 @@ python3 tempMonitor.py &
 python3 imuSensor.py &
 python3 gpsModule.py &
 python3 airSensor.py &
-python3 buttons.py & #use python instead of python3 so it wont be terminated on restartApps.sh
+python3 obdMisc.py & #use python instead of python3 so it wont be terminated on restartApps.sh
 #chromium-browser --window-position=0,0 --kiosk
 #unclutter -idle 1 &
