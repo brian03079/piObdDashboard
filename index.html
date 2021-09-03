@@ -1,354 +1,360 @@
 <!DOCTYPE html>
 <html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=.7" />
 
-<head>
-  <meta name="viewport" content="width=device-width, initial-scale=.7">
+        <title>piObdDashboard</title>
+    </head>
 
-	<title>piObdDashboard</title>
-</head>
+    <body id="dashboardBody">
+        <div id="homePage" class="container-fluid">
+            <script src="/js/jquery.min.js"></script>
+            <script src="/js/plotly-latest.min.js"></script>
+            <script src="/js/bootstrap.min.js"></script>
+            <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css" />
+            <link rel="stylesheet" type="text/css" href="/css/bootstrap-theme.min.css" />
+            <link rel="stylesheet" type="text/css" href="/css/index.css" />
+            <script src="/js/socket.io.min.js"></script>
+            <ul class="nav justify-content-start">
+                <h6 class="nav-item ml-auto">Runtime:</h6>
+                <h6 class="nav-item ml-auto" id="runTimeField">--</h6>
+                <h6 class="nav-item ml-auto">Idle:</h6>
+                <h6 class="nav-item ml-auto" id="idleTimeField">--</h6>
+                <li class="nav-item ml-auto"><a id="sensorDumpButton" class="nav-link">Sensor Dump</a></li>
+                <li class="nav-item ml-auto"><a id="homeButton" class="nav-link">Home</a></li>
+            </ul>
+            <div class="container-fluid">
+                <div class="row">
+                    <table class="telemetry-table">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <h4 class="pad-left">MPH</h4>
+                                    <h1 class="mph pad-right" id="speedField" onclick="toggleFullScreen(document.body)">--</h1>
+                                </td>
+                                <td>
+                                    <table>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <h4>RPM</h4>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <h1 class="rpm rpmCell" id="rpmField">--</h1>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="pad-top">
+                                                    <h3 id="throttleField">--</h3>
+                                                </td>
+                                                <td class="col-sm-4">
+                                                    <h3 id="cabinTempField">--</h3>
+                                                </td>
+                                                <td class="col-sm-4">
+                                                    <h3 id="cabinHumidityField">--</h3>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <h6>% Throttle</h6>
+                                                </td>
+                                                <td class="col-sm-4">
+                                                    <h6 id="cabinTempHeader">Cabin Temp</h6>
+                                                </td>
+                                                <td class="col-sm-4">
+                                                    <h6>% Humidity</h6>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-<body id="dashboardBody">
-	<div id="homePage" class="container-fluid">
-		<script src="/js/jquery.min.js"></script>
-		<script src="/js/plotly-latest.min.js"></script>
-		<script src="/js/bootstrap.min.js"></script>
-		<link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css" />
-		<link rel="stylesheet" type="text/css" href="/css/bootstrap-theme.min.css" />
-    <link rel="stylesheet" type="text/css" href="/css/index.css" />
-		<script src="/js/socket.io.min.js"></script>
-		<ul class="nav justify-content-start">
+            <div class="wrapper">
+                <script></script>
+                <div id="speedChart"></div>
+                <script>
+                       function toggleFullScreen(elem) {
+                         // ## The below if statement seems to work better ## if ((document.fullScreenElement && document.fullScreenElement !== null) || (document.msfullscreenElement && document.msfullscreenElement !== null) || (!document.mozFullScreen && !document.webkitIsFullScreen)) {
+                         if ((document.fullScreenElement !== undefined && document.fullScreenElement === null) || (document.msFullscreenElement !== undefined && document.msFullscreenElement === null) || (document.mozFullScreen !== undefined && !document.mozFullScreen) || (document.webkitIsFullScreen !== undefined && !document.webkitIsFullScreen)) {
+                             if (elem.requestFullScreen) {
+                                 elem.requestFullScreen();
+                             } else if (elem.mozRequestFullScreen) {
+                                 elem.mozRequestFullScreen();
+                             } else if (elem.webkitRequestFullScreen) {
+                                 elem.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+                             } else if (elem.msRequestFullscreen) {
+                                 elem.msRequestFullscreen();
+                             }
+                         } else {
+                             if (document.cancelFullScreen) {
+                                 document.cancelFullScreen();
+                             } else if (document.mozCancelFullScreen) {
+                                 document.mozCancelFullScreen();
+                             } else if (document.webkitCancelFullScreen) {
+                                 document.webkitCancelFullScreen();
+                             } else if (document.msExitFullscreen) {
+                                 document.msExitFullscreen();
+                             }
+                         }
+                       }
 
-        <h6 class="nav-item ml-auto">Runtime:</h6>
-        <h6 class="nav-item ml-auto" id="runTimeField">--</h6>
-        <h6 class="nav-item ml-auto">Idle:</h6>
-        <h6 class="nav-item ml-auto" id="idleTimeField">--</h6>
-			<li class="nav-item ml-auto"> <a id="sensorDumpButton" class="nav-link">Sensor Dump</a> </li>
-			<li class="nav-item ml-auto"> <a id="homeButton" class="nav-link">Home</a> </li>
-		</ul>
-		<div class="container-fluid">
-			<div class="row">
-				<table class="telemetry-table">
-					<tbody>
-						<tr>
-							<td>
-								<h4 class="pad-left">MPH</h4>
-								<h1 class="mph pad-right" id="speedField" onclick="toggleFullScreen(document.body)">--</h1> </td>
-							<td>
-								<table>
-									<tbody>
-										<tr>
-											<td>
-												<h4>RPM</h4></td>
-										</tr>
-										<tr>
-											<td>
-												<h1 class="rpm rpmCell" id="rpmField">--</h1></td>
-										</tr>
-										<tr>
-											<td class="pad-top">
-												<h3 id="throttleField">--</h3></td>
-											<td class="col-sm-4">
-												<h3 id="cabinTempField">--</h3></td>
-											<td class="col-sm-4">
-												<h3 id="cabinHumidityField">--</h3></td>
-										</tr>
-										<tr>
-											<td>
-												<h6>% Throttle</h6></td>
-											<td class="col-sm-4">
-												<h6 id="cabinTempHeader">Cabin Temp</h6></td>
-											<td class="col-sm-4">
-												<h6>% Humidity</h6></td>
-										</tr>
-									</tbody>
-								</table>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-		</div>
+                       function secondsToHHMMSS(seconds) {
+                         var date = new Date(null);
+                         date.setSeconds(seconds);
+                         return date.toISOString().substr(11, 8);
+                       }
 
-		<div class="wrapper">
-			<script></script>
-			<div id="speedChart"></div>
-			<script>
-      function toggleFullScreen(elem) {
-        // ## The below if statement seems to work better ## if ((document.fullScreenElement && document.fullScreenElement !== null) || (document.msfullscreenElement && document.msfullscreenElement !== null) || (!document.mozFullScreen && !document.webkitIsFullScreen)) {
-        if ((document.fullScreenElement !== undefined && document.fullScreenElement === null) || (document.msFullscreenElement !== undefined && document.msFullscreenElement === null) || (document.mozFullScreen !== undefined && !document.mozFullScreen) || (document.webkitIsFullScreen !== undefined && !document.webkitIsFullScreen)) {
-            if (elem.requestFullScreen) {
-                elem.requestFullScreen();
-            } else if (elem.mozRequestFullScreen) {
-                elem.mozRequestFullScreen();
-            } else if (elem.webkitRequestFullScreen) {
-                elem.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
-            } else if (elem.msRequestFullscreen) {
-                elem.msRequestFullscreen();
-            }
-        } else {
-            if (document.cancelFullScreen) {
-                document.cancelFullScreen();
-            } else if (document.mozCancelFullScreen) {
-                document.mozCancelFullScreen();
-            } else if (document.webkitCancelFullScreen) {
-                document.webkitCancelFullScreen();
-            } else if (document.msExitFullscreen) {
-                document.msExitFullscreen();
-            }
-        }
-      }
-      
-      function secondsToHHMMSS(seconds) {
-        var date = new Date(null);
-        date.setSeconds(seconds);
-        return date.toISOString().substr(11, 8);
-      }
-        
-			var degreeSymbol = String.fromCharCode(176);
-			var degreeMetric = "F";
-			$("#cabinTempHeader").text("Cabin Temp " + degreeSymbol + degreeMetric);
-			
-      var startTime = new Date($.now());
-			var x_max = 500; //max number of data points per plot
-      
-      var fontSize = 20;
-			var defaultColor = '#00ba00';
-			var plotBackgroundColor = '#000000';
-      var plotHeight = 300;
-      var plotLeftMargin = 35;
-      var plotRightMargin = 10;
-      var plotBottomMargin = 25;
-      var plotTopMargin = 10;
-      var padding = 1; //spacing between graph and labels
-      var numXTicks = 5; //max number of x labels per graph
-      var tickAngle = 0;
-      var lineWidth = 1;
-      
-      var config = { responsive: true }
-      
-			var speedLayout = {
-				autosize: true,
-        height: plotHeight,
-				margin: {
-					l: plotLeftMargin,
-					r: plotRightMargin,
-					b: plotBottomMargin,
-					t: plotTopMargin,
-					pad: padding
-				},
-				xaxis: {
-					<!--tickformat: "%I:%M" -->
-					tickangle: tickAngle,
-					nticks: numXTicks,
-					gridcolor: defaultColor
-				},
-				yaxis: {
-					<!-- rangemode:'tozero' -->
-					gridcolor: defaultColor
-				},
-				font: {
-					size: fontSize,
-					color: defaultColor
-				},
-				paper_bgcolor: plotBackgroundColor,
-				plot_bgcolor: plotBackgroundColor
-			};
-      
-			Plotly.react('speedChart', [{
-				x: [startTime],
-				y: [0],
-				type: 'line',
-				line: {
-					color: defaultColor,
-					width: lineWidth
-				},
-				fill: 'tozeroy'
-			}], speedLayout, config);
+                    var degreeSymbol = String.fromCharCode(176);
+                    var degreeMetric = "F";
+                    $("#cabinTempHeader").text("Cabin Temp " + degreeSymbol + degreeMetric);
 
-			function updateSpeedChart(speed, time) {
-				var speedingSpeed = 85000;
-				var warningSpeed = 80;
-				var parsedSpeed = parseInt(speed);
-        
-				$("#speedField").text(speed);
-        
-				var speedTrace = {
-					x: [
-						[time]
-					],
-					y: [
-						[speed]
-					]
-				}
-				Plotly.extendTraces('speedChart', speedTrace, [0], x_max);
-			}
-			</script>
-		</div>
-		<div class="wrapper">
-			<div id="rpmChart"></div>
-			<script>
-			var rpmLayout = {
-				autosize: true,
-				height: plotHeight,
-				margin: {
-					l: plotLeftMargin,
-					r: plotRightMargin,
-					b: plotBottomMargin,
-					t: plotTopMargin,
-					pad: padding
-				},
-				xaxis: {
-					<!--tickformat: "%I:%M" -->
-					tickangle: tickAngle,
-					nticks: numXTicks,
-					gridcolor: defaultColor
-				},
-				yaxis: {
-					gridcolor: defaultColor
-				},
-				font: {
-					size: fontSize,
-					color: defaultColor
-				},
-				paper_bgcolor: plotBackgroundColor,
-				plot_bgcolor: plotBackgroundColor
-			};
-			Plotly.react('rpmChart', [{
-				x: [startTime],
-				y: [0],
-				type: 'line',
-				line: {
-					color: defaultColor,
-					width: lineWidth
-				},
-				fill: 'tozeroy'
-			}], rpmLayout, config);
+                       var startTime = new Date($.now());
+                    var x_max = 500; //max number of data points per plot
 
-			function updateRpmChart(rpm, time) {
-				var highRpm = 6500;
-				var mediumRpm = 4000;
-				var parsedRpm = parseInt(rpm);
-				$("#rpmField").text(rpm);
-        
-				if(parsedRpm >= highRpm) {
-					$("#rpmField").css('color', 'red');
-				} else if(parsedRpm >= mediumRpm && parsedRpm < highRpm) {
-					$("#rpmField").css('color', 'yellow');
-				} else {
-					$("#rpmField").css('color', defaultColor);
-				}
-        
-				var scaledRpm = (rpm / 1000).toFixed(3);
-				var rpmTrace = {
-					x: [
-						[time]
-					],
-					y: [
-						[scaledRpm]
-					]
-				}
-				Plotly.extendTraces('rpmChart', rpmTrace, [0], x_max);
-			}
-			</script>
-		</div>
-		<script>
-    function updateRunTimeFields(runTime, idleTime) {
-      $("#runTimeField").text(secondsToHHMMSS(runTime));
-      $("#idleTimeField").text(secondsToHHMMSS(Math.round(idleTime)));
-    }
-		function updateCabinTempHumidity(temp, humidity) {
-			$("#cabinTempField").text(temp);
-			$("#cabinHumidityField").text(humidity);
-		}
-    
-		var socket = io();
-		if(socket != null) {
-			$("#statusField").text = "Connected";
-		}
-    
-		socket.on("data", function(msg) {
-			var currentTime = new Date($.now());
-			var carData = $.parseJSON(msg);
-			var speed = parseInt(carData["speed"]);
-			var rpm = parseInt(carData["rpm"]);
-			var throttle = parseInt(carData["throttle"]);
-      
-			var runTime = parseInt(carData["runTime"]);
-      var idleTime = parseInt(carData["idleTime"]); //approximation based on update interval defined in obdDash.py
-      
-			$("#throttleField").text(throttle);
-      
-      updateRunTimeFields(runTime, idleTime);
-			updateSpeedChart(speed, currentTime);
-			updateRpmChart(rpm, currentTime);
-		});
-		socket.on("cabinTempHumidity", function(msg) {
-			var data = $.parseJSON(msg);
-			var temp = data["temp"];
-			var humidity = data["humidity"];
-			updateCabinTempHumidity(temp, humidity);
-		});
-		</script>
-		<div id="dtcContainer" class="container-fluid">
-			<table id="myTable" class="table" data-toggle="table" data-mobile-responsive="true" data-pagination="true">
-				<thead>
-					<tr>
-						<th>Error Code (DTC)</th>
-						<th>Description</th>
-					</tr>
-				</thead>
-				<tbody></tbody>
-			</table>
-		</div>
-		<script>
-		var tbody = $("#myTable").children("tbody");
-		var table = tbody.length ? tbody : $("#myTable");
-		//this should only get called when there is a change in DTC(s). That logic
-		//is handled in piObd.py. We clear the table and add the codes + descriptions
-		socket.on("dtcData", function(faultCodes) {
-			table.empty();
-			for(var i = 0; i < faultCodes.length; i++) {
-				var codeDescArray = faultCodes[i];
-				var code = codeDescArray[0];
-				var description = codeDescArray[1];
-				table.append("<tr id=" + code + "><td>" + code + "</td><td>" + description + "</td></tr>");
-			}
-		});
-		</script>
-	</div>
-	<div hidden id="sensorDumpPage" class="container-fluid">
-		<div class="container">
-			<button id="testButton">test </button>
-			<table id="sensorDumpTable" class="table" data-toggle="table" data-mobile-responsive="true" data-pagination="true">
-				<thead>
-					<tr>
-						<th>Name</th>
-						<th>Description</th>
-						<th>Response Value</th>
-					</tr>
-				</thead>
-				<tbody></tbody>
-			</table>
-		</div>
-		<script>
-		$('#testButton').click(function() {
-			socket.emit("sensorDumpRequest");
-		});
-		var sensorDumpBody = $("#sensorDumpTable").children("tbody");
-		var sensorDumpTable = sensorDumpBody.length ? sensorDumpBody : $("#sensorDumpTable");
-		socket.on("sensorDumpData", function(sensorDumpData) {
-			sensorDumpTable.empty();
-			console.log(sensorDumpData);
-			for(var i = 0; i < sensorDumpData.length; i++) {
-				var entry = sensorDumpData[i];
-				var name = entry['Name'];
-				var description = entry['Description'];
-				var value = entry['Value'];
-				sensorDumpTable.append("<tr id=" + name + "><td>" + name + "</td><td>" + value + "</td><td>" + description + "</td></tr>");
-			}
-		});
-		</script>
-	</div>
-</body>
+                       var fontSize = 20;
+                    var defaultColor = '#00ba00';
+                    var plotBackgroundColor = '#000000';
+                       var plotHeight = 300;
+                       var plotLeftMargin = 35;
+                       var plotRightMargin = 10;
+                       var plotBottomMargin = 25;
+                       var plotTopMargin = 10;
+                       var padding = 1; //spacing between graph and labels
+                       var numXTicks = 5; //max number of x labels per graph
+                       var tickAngle = 0;
+                       var lineWidth = 1;
 
+                       var config = { responsive: true }
+
+                    var speedLayout = {
+                    	autosize: true,
+                         height: plotHeight,
+                    	margin: {
+                    		l: plotLeftMargin,
+                    		r: plotRightMargin,
+                    		b: plotBottomMargin,
+                    		t: plotTopMargin,
+                    		pad: padding
+                    	},
+                    	xaxis: {
+                    		<!--tickformat: "%I:%M" -->
+                    		tickangle: tickAngle,
+                    		nticks: numXTicks,
+                    		gridcolor: defaultColor
+                    	},
+                    	yaxis: {
+                    		<!-- rangemode:'tozero' -->
+                    		gridcolor: defaultColor
+                    	},
+                    	font: {
+                    		size: fontSize,
+                    		color: defaultColor
+                    	},
+                    	paper_bgcolor: plotBackgroundColor,
+                    	plot_bgcolor: plotBackgroundColor
+                    };
+
+                    Plotly.react('speedChart', [{
+                    	x: [startTime],
+                    	y: [0],
+                    	type: 'line',
+                    	line: {
+                    		color: defaultColor,
+                    		width: lineWidth
+                    	},
+                    	fill: 'tozeroy'
+                    }], speedLayout, config);
+
+                    function updateSpeedChart(speed, time) {
+                    	var speedingSpeed = 85000;
+                    	var warningSpeed = 80;
+                    	var parsedSpeed = parseInt(speed);
+
+                    	$("#speedField").text(speed);
+
+                    	var speedTrace = {
+                    		x: [
+                    			[time]
+                    		],
+                    		y: [
+                    			[speed]
+                    		]
+                    	}
+                    	Plotly.extendTraces('speedChart', speedTrace, [0], x_max);
+                    }
+                </script>
+            </div>
+            <div class="wrapper">
+                <div id="rpmChart"></div>
+                <script>
+                    var rpmLayout = {
+                    	autosize: true,
+                    	height: plotHeight,
+                    	margin: {
+                    		l: plotLeftMargin,
+                    		r: plotRightMargin,
+                    		b: plotBottomMargin,
+                    		t: plotTopMargin,
+                    		pad: padding
+                    	},
+                    	xaxis: {
+                    		<!--tickformat: "%I:%M" -->
+                    		tickangle: tickAngle,
+                    		nticks: numXTicks,
+                    		gridcolor: defaultColor
+                    	},
+                    	yaxis: {
+                    		gridcolor: defaultColor
+                    	},
+                    	font: {
+                    		size: fontSize,
+                    		color: defaultColor
+                    	},
+                    	paper_bgcolor: plotBackgroundColor,
+                    	plot_bgcolor: plotBackgroundColor
+                    };
+                    Plotly.react('rpmChart', [{
+                    	x: [startTime],
+                    	y: [0],
+                    	type: 'line',
+                    	line: {
+                    		color: defaultColor,
+                    		width: lineWidth
+                    	},
+                    	fill: 'tozeroy'
+                    }], rpmLayout, config);
+
+                    function updateRpmChart(rpm, time) {
+                    	var highRpm = 6500;
+                    	var mediumRpm = 4000;
+                    	var parsedRpm = parseInt(rpm);
+                    	$("#rpmField").text(rpm);
+
+                    	if(parsedRpm >= highRpm) {
+                    		$("#rpmField").css('color', 'red');
+                    	} else if(parsedRpm >= mediumRpm && parsedRpm < highRpm) {
+                    		$("#rpmField").css('color', 'yellow');
+                    	} else {
+                    		$("#rpmField").css('color', defaultColor);
+                    	}
+
+                    	var scaledRpm = (rpm / 1000).toFixed(3);
+                    	var rpmTrace = {
+                    		x: [
+                    			[time]
+                    		],
+                    		y: [
+                    			[scaledRpm]
+                    		]
+                    	}
+                    	Plotly.extendTraces('rpmChart', rpmTrace, [0], x_max);
+                    }
+                </script>
+            </div>
+            <script>
+                function updateRunTimeFields(runTime, idleTime) {
+                    $("#runTimeField").text(secondsToHHMMSS(runTime));
+                    $("#idleTimeField").text(secondsToHHMMSS(Math.round(idleTime)));
+                }
+                function updateCabinTempHumidity(temp, humidity) {
+                    $("#cabinTempField").text(temp);
+                    $("#cabinHumidityField").text(humidity);
+                }
+
+                var socket = io();
+                if (socket != null) {
+                    $("#statusField").text = "Connected";
+                }
+
+                socket.on("data", function (msg) {
+                    var currentTime = new Date($.now());
+                    var carData = $.parseJSON(msg);
+                    var speed = parseInt(carData["speed"]);
+                    var rpm = parseInt(carData["rpm"]);
+                    var throttle = parseInt(carData["throttle"]);
+
+                    var runTime = parseInt(carData["runTime"]);
+                    var idleTime = parseInt(carData["idleTime"]); //approximation based on update interval defined in obdDash.py
+
+                    $("#throttleField").text(throttle);
+
+                    updateRunTimeFields(runTime, idleTime);
+                    updateSpeedChart(speed, currentTime);
+                    updateRpmChart(rpm, currentTime);
+                });
+                socket.on("cabinTempHumidity", function (msg) {
+                    var data = $.parseJSON(msg);
+                    var temp = data["temp"];
+                    var humidity = data["humidity"];
+                    updateCabinTempHumidity(temp, humidity);
+                });
+            </script>
+            <div id="dtcContainer" class="container-fluid">
+                <table id="myTable" class="table" data-toggle="table" data-mobile-responsive="true" data-pagination="true">
+                    <thead>
+                        <tr>
+                            <th>Error Code (DTC)</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <script>
+                var tbody = $("#myTable").children("tbody");
+                var table = tbody.length ? tbody : $("#myTable");
+                //this should only get called when there is a change in DTC(s). That logic
+                //is handled in piObd.py. We clear the table and add the codes + descriptions
+                socket.on("dtcData", function (faultCodes) {
+                    table.empty();
+                    for (var i = 0; i < faultCodes.length; i++) {
+                        var codeDescArray = faultCodes[i];
+                        var code = codeDescArray[0];
+                        var description = codeDescArray[1];
+                        table.append("<tr id=" + code + "><td>" + code + "</td><td>" + description + "</td></tr>");
+                    }
+                });
+            </script>
+        </div>
+        <div hidden id="sensorDumpPage" class="container-fluid">
+            <div class="container">
+                <button id="testButton">test</button>
+                <table id="sensorDumpTable" class="table" data-toggle="table" data-mobile-responsive="true" data-pagination="true">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Response Value</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <script>
+                $("#testButton").click(function () {
+                    socket.emit("sensorDumpRequest");
+                });
+                var sensorDumpBody = $("#sensorDumpTable").children("tbody");
+                var sensorDumpTable = sensorDumpBody.length ? sensorDumpBody : $("#sensorDumpTable");
+                socket.on("sensorDumpData", function (sensorDumpData) {
+                    sensorDumpTable.empty();
+                    console.log(sensorDumpData);
+                    for (var i = 0; i < sensorDumpData.length; i++) {
+                        var entry = sensorDumpData[i];
+                        var name = entry["Name"];
+                        var description = entry["Description"];
+                        var value = entry["Value"];
+                        sensorDumpTable.append("<tr id=" + name + "><td>" + name + "</td><td>" + value + "</td><td>" + description + "</td></tr>");
+                    }
+                });
+            </script>
+        </div>
+    </body>
 </html>
