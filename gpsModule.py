@@ -11,6 +11,8 @@ import obdUtils
 SENSOR_TYPE = 'GPS'
 ERROR = 'ERR'
 INFO = 'INFO'
+RETRY_INTERVAL = 1 #Delay in seconds when retrying to connect to node server
+
 
 LATITUDE_DEC_PLACES = 5
 LONGITUDE_DEC_PLACES = 5
@@ -83,7 +85,7 @@ while True: #loop until a connection is made with the server instead of immediat
     except Exception as ex:
         numTries += 1
         print("GPS app unable to connect to node server, retrying attempt {0}".format(numTries))
-        time.sleep(1)
+        time.sleep(RETRY_INTERVAL)
             
         continue
 

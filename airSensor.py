@@ -14,6 +14,8 @@ SENSOR_TYPE = 'AIR'
 ERROR = 'ERR'
 INFO = 'INFO'
 
+RETRY_INTERVAL = 1 #Delay in seconds when retrying to connect to node server
+
 DELAY = 1 #sensor polling interval in seconds. Max polling rate 1s for PMSA003I 
 
  
@@ -60,7 +62,7 @@ while True: #loop until a connection is made with the server instead of immediat
     except Exception as ex:
         numTries += 1
         print("Unable to connect to node server, retrying attempt {0}".format(numTries))
-        time.sleep(1)
+        time.sleep(RETRY_INTERVAL)
             
         continue
 

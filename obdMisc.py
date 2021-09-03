@@ -10,6 +10,8 @@ import datetime
 import obdUtils
 
 POLL_INTERVAL = 1 #seconds
+RETRY_INTERVAL = 1 #Delay in seconds when retrying to connect to node server
+
  
 # Use the Broadcom SOC Pin numbers
 # Setup the pin with internal pullups enabled and pin in reading mode.
@@ -88,7 +90,7 @@ while True: #loop until a connection is made with the server instead of immediat
         print(errorLog)
         numTries += 1
         print("buttons app unable to connect to node server, retrying attempt {0}".format(numTries))
-        time.sleep(1)
+        time.sleep(RETRY_INTERVAL)
             
         continue
 

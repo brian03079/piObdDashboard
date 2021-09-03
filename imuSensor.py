@@ -11,6 +11,7 @@ import obdUtils
 SENSOR_TYPE = 'IMU'
 ERROR = 'ERR'
 INFO = 'INFO'
+RETRY_INTERVAL = 1 #Delay in seconds when retrying to connect to node server
 POLL_INTERVAL = .0333333 #~30hz
 
 GRAVITY = 9.80665
@@ -73,7 +74,7 @@ def emitImuData():
             
             sio.emit('imuData', json.dumps(data))
             
-        except Exception as ex: #logs any errors encountered during reading of gps. Also allows program to pick back up if node server connection is lost
+        except Exception as ex: 
                 
                 errorLog = obdUtils.createLogMessage(ERROR, SENSOR_TYPE, type(ex).__name__, ex.args)
                 print(errorLog)
@@ -97,7 +98,7 @@ while True: #loop until a connection is made with the server instead of immediat
         print("IMU app unable to connect to node server, retrying attempt {0}".format(numTries))
         errorLog = obdUtils.createLogMessage(ERROR, SENSOR_TYPE, type(ex).__name__, ex.args)
         print(errorLog)
-        time.sleep(1)
+        time.sleep(RETRY_INTERVAL)
             
         continue
         
