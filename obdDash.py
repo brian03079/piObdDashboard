@@ -71,7 +71,7 @@ def emitTelemetry():
             
             emitDtcCodes()
             
-            time.sleep(RETRY_INTERVAL)
+            time.sleep(delay)
             
         except Exception as ex: #logs any errors
             errorLog = obdUtils.createLogMessage(ERROR, SENSOR_TYPE, type(ex).__name__, ex.args)
