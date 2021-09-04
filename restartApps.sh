@@ -17,7 +17,7 @@ python3 airSensor.py &
 python3 obdMisc.py &
 
 cd /home/pi/piDashcam
-sudo python3 dashcam.py &
+#sudo python3 dashcam.py &
 
 chromium-browser --window-position=0,0    --kiosk --user-data-dir="/home/pi/Documents/Profiles/0" http://localhost:3000 &
 chromium-browser --window-position=600,0    --kiosk --user-data-dir="/home/pi/Documents/Profiles/1" http://localhost:3000/misc &
