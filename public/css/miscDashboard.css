@@ -50,8 +50,8 @@ canvas{
 }
 
 .logContainer {
-  height: 9em;
-  overflow:auto;
+  height: 7em;
+  overflow: hidden;
 }
 
 .borderGreen {
