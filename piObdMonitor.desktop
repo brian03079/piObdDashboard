@@ -1,4 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=piObdMonitor
-Exec=xterm -geometry 100x70+0+0 -e '/usr/bin/bash /home/pi/piObdDashboard/start.sh'
