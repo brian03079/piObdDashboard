@@ -1,0 +1,4 @@
+@lxpanel --profile LXDE-pi
+@pcmanfm --desktop --profile LXDE-pi
+@xscreensaver -no-splash
+@bash /home/pi/piObdDashboard/startApps.sh
