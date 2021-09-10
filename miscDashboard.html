@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html>
+    <body id="dashboardBody">
+        <script src="/js/jquery.min.js"></script>
+        <script src="/js/plotly-latest.min.js"></script>
+        <script src="/js/bootstrap.min.js"></script>
+              
+        <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css" />
+        <link rel="stylesheet" type="text/css" href="/css/bootstrap-theme.min.css" />
+        <link rel="stylesheet" type="text/css" href="/css/miscDashboard.css" />
+        <script src="/js/socket.io.min.js"></script>
+        <div id="airQualityDiv" class="divider">
+            <div class="container-fluid d-flex h-100 flex-column">
+                <div class="row">
+                    <div class="col col-sm-5">
+                        <h4 class="bold">Air Quality</h4>
+                    </div>
+                </div>
+                <div class="row h-100">
+                    <div class="col col-sm-3" id="pm10Header">PM1.0:</div>
+                    <div class="col col-sm-2" id="pm10Field">--</div>
+                    <div class="col col-sm-7 padding-0 borderGreen" id="pm10BarContainer">
+                        <div class="bar" id="pm10Bar">-</div>
+                    </div>
+                </div>
+                <div class="row h-100">
+                    <div class="col col-sm-3" id="pm25Header">PM2.5:</div>
+                    <div class="col col-sm-2" id="pm25Field">--</div>
+                    <div class="col col-sm-7 padding-0 borderGreen" id="pm25BarContainer">
+                        <div class="bar" id="pm25Bar">-</div>
+                    </div>
+                </div>
+                <div class="row h-100">
+                    <div class="col col-sm-3" id="pm100Header">PM10:</div>
+                    <div class="col col-sm-2" id="pm100Field">--</div>
+                    <div class="col col-sm-7 padding-0 borderGreen" id="pm100BarContainer">
+                        <div class="bar" id="pm100Bar">-</div>
+                    </div>
+                </div>
+                <div class="row hidden">
+                    <div class="col col-sm-6" id="pm3umHeader">PM > .3um / 0.1L air:</div>
+                    <div class="col col-sm-2" id="pm3umField">--</div>
+                </div>
+                <div class="row hidden">
+                    <div class="col col-sm-6" id="pm5umHeader">PM > .5um / 0.1L air:</div>
+                    <div class="col col-sm-2" id="pm5umField">--</div>
+                </div>
+                <div class="row hidden">
+                    <div class="col col-sm-6" id="pm10umHeader">PM > 1.0um / 0.1L air:</div>
+                    <div class="col col-sm-2" id="pm10umField">--</div>
+                </div>
+                <div class="row hidden">
+                    <div class="col col-sm-6" id="pm25umHeader">PM > 2.5um / 0.1L air:</div>
+                    <div class="col col-sm-2" id="pm25umField">--</div>
+                </div>
+                <div class="row hidden">
+                    <div class="col col-sm-6" id="pm50umHeader">PM > 5.0um / 0.1L air:</div>
+                    <div class="col col-sm-2" id="pm50umField">--</div>
+                </div>
+                <div class="row hidden">
+                    <div class="col col-sm-6" id="pm100umHeader">PM > 10um / 0.1L air:</div>
+                    <div class="col col-sm-2" id="pm100umField">--</div>
+                </div>
+                <div class="row hidden">
+                    <div class="col col-sm-6" id="airQualityErrorHeader">Read Errors:</div>
+                    <div class="col col-sm-2" id="airQualityErrorField">0</div>
+                </div>
+            </div>
+        </div>
+        <div id="gpsDiv" class="divider">
+            <div class="container-fluid d-flex h-100 flex-column">
+                <div class="row">
+                    <div class="col col-sm-2">
+                        <h4 class="bold">GPS</h4>
+                    </div>
+                    <div class="col col-sm-2" id="fixField">--</div>
+                    <div class="col col-sm-8 subheading" id="timeField">--</div>
+                </div>
+                <div class="row">
+                    <div class="col col-sm-4">Latitude:</div>
+                    <div class="col col-sm-3" id="latitudeField">--</div>
+                    <div class="col col-sm-2">+/-</div>
+                    <div class="col col-sm-2" id="latitudeErrField">--</div>
+                </div>
+                <div class="row paddingTop">
+                    <div class="col col-sm-4">Longitude:</div>
+                    <div class="col col-sm-3" id="longitudeField">--</div>
+                    <div class="col col-sm-2">+/-</div>
+                    <div class="col col-sm-2" id="longitudeErrField">--</div>
+                </div>
+                <div class="row paddingTop">
+                    <div class="col col-sm-4">Altitude:</div>
+                    <div class="col col-sm-3" id="altitudeField">--</div>
+                    <div class="col col-sm-2">+/-</div>
+                    <div class="col col-sm-2" id="altitudeErrField">--</div>
+                </div>
+                <div class="row hidden">
+                    <div class="col col-sm-4">Speed(mph):</div>
+                    <div class="col col-sm-3" id="speedField">--</div>
+                    <div class="col col-sm-2">+/-</div>
+                    <div class="col col-sm-2" id="speedErrField">--</div>
+                </div>
+                <div class="row paddingTop">
+                    <div class="col col-sm-4">Climb:</div>
+                    <div class="col col-sm-3" id="climbField">--</div>
+                    <div class="col col-sm-2">+/-</div>
+                    <div class="col col-sm-2" id="climbErrField">--</div>
+                </div>
+                <div class="row paddingTop">
+                    <div class="col col-sm-4">Heading&deg;:</div>
+                    <div class="col col-sm-3" id="headingField">--</div>
+                    <div class="col col-sm-2"></div>
+                    <div class="col col-sm-2"></div>
+                </div>
+                <div class="row hidden">
+                    <div class="col-sm">Grid Square:</div>
+                    <div class="col-sm"></div>
+                    <div class="col-sm"></div>
+                    <div class="col-sm"></div>
+                </div>
+            </div>
+        </div>
+        <div id="imuDIV" class="divider">
+
+            <div class="container-fluid  h-100">
+                <div class="row">
+                    <div class="col col-sm-3">
+                        <h4 class="bold">Accel:</h4>
+                    </div>
+                    <div class="col col-sm-3">
+                        <h4 id="accelField">--</h4>
+                    </div>
+                    <div class="col col-sm-3">
+                        <h4 class="bold">Gs:</h4>
+                    </div>
+                    <div class="col col-sm-2">
+                        <h4 id="gForceField">--</h4>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col col-sm-3">
+                        <h4 class="bold">Pitch&deg;</h4>
+                    </div>
+                    <div class="col col-sm-3">
+                        <h4 id="pitch">--</h4>
+                    </div>
+                    <div class="col col-sm-3">
+                        <h4 class="bold">Roll&deg;</h4>
+                    </div>
+                        
+                    <div class="col col-sm-2">
+                        <h4 id="roll">--</h4>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm">
+                        <canvas id="pitchView" width="200" height="200"></canvas> <!--width and height of canvas must be set manually here to avoid coordinate scaling issue of using CSS -->
+                    </div>
+                    <div class="col-sm">
+                        <canvas id="rollView" width="200" height="200"></canvas>
+                    </div>
+                </div>
+              </div>
+        </div>
+        <div id="miscDataDiv" class="divider">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col col-sm-3" id="cpuTempHeader">CPU&deg;C:</div>
+                    <div class="col col-sm-2" id="cpuTempField">--</div>
+                    <div class="col col-sm-3" id="cpuUsageHeader">CPU %:</div>
+                    <div class="col col-sm-2" id="cpuUsageField">--</div>
+                </div>
+                <div class="row">
+                    <div class="col col-sm-3" id="gpuTempHeader">GPU&deg;C:</div>
+                    <div class="col col-sm-2" id="gpuTempField">--</div>
+                    <div class="col col-sm-3" id="diskUsageHeader">Disk %:</div>
+                    <div class="col col-sm-2" id="diskUsageField">--</div>
+                </div>
+                <div class="row">
+                    <div class="col col-sm-3" id="logsHeader">Logs:</div>
+                </div>
+                <div id="logContainer" class="logContainer">
+                    <div id="logPlaceHolder" class="row log pad-left"></div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
+
+<script>
+    var DEFAULT_COLOR = '#00ba00';
+    var MAX_NUM_LOGS = 7;
+    
+    //Ceiling values are based on
+    //https://www3.epa.gov/region1/airquality/pm-aq-standards.html
+    //There are no recommendations on PM1.0 values.  Ideally should be close to 0 as possible. Most harmful particulate matter
+    //Note PM10 is PM1.0, PM25 is PM2.5, and PM100 is PM10
+    var PM10_AIR_CEILING = 14 * 2;//no offical recommended value. Multiply by 2 to set max num particles per bar
+    var PM25_AIR_CEILING = 35 * 2;//recommended 12 ug/m3 or less for annual PM2.5 standard. 35 ug/m3 for daily value
+    var PM100_AIR_CEILING = 54 * 2; //recommended 150 ug/m3 per day. 50 ug/m3 for annual value, but was revoked sept 2006
+    var GOOD_AIR_COLOR = DEFAULT_COLOR; //neon-ish green
+    var FAIR_AIR_COLOR = 'yellow';
+    var POOR_AIR_COLOR = 'rgb(255, 0, 0)'; //red. RGB value used for easier comparison logic later
+    var PM10_BAR_SCALAR = 100 / PM10_AIR_CEILING; //scalar used to accurately change bar graph size and color based on ceilings
+    var PM25_BAR_SCALAR = 100 / PM25_AIR_CEILING;
+    var PM100_BAR_SCALAR = 100 / PM100_AIR_CEILING;
+    
+    var barGraphs = [
+        $("#pm10Bar"),
+        $("#pm25Bar"),
+        $("#pm100Bar")
+    ];
+
+    
+    $(document).ready(() => {
+        
+        /*Code to setup listeners for data*/
+        
+        var socket = io();
+        if (socket != null) {
+            $("#statusField").text = "Connected";
+        }
+        
+        socket.on("airQualityData", function(msg) {
+            updateAirQualityStats(msg);
+        });
+        
+        socket.on("log", function(msg) {
+            updateLogs(msg);
+        });
+
+        socket.on("gpsData", function(msg) {
+            updateGpsStats(msg);
+        });
+        
+        socket.on("imuData", function(msg) {
+            updateBnoData(msg);
+        });
+        
+        socket.on("sysTempData", function(msg) {
+			updateSysTempData(msg);
+		});
+        
+        socket.on("sysInfoData", function(msg) {
+			updateSysInfoData(msg);
+		});
+        
+        //set the air quality bars to flash if they are red
+        setInterval(() => {
+            for (i = 0; i < barGraphs.length; i++) {
+                var rgbColor = barGraphs[i].css("background-color");
+
+                if (rgbColor == POOR_AIR_COLOR) {
+                    barGraphs[i].toggleClass("hidden");
+                } else {
+                    barGraphs[i].removeClass("hidden");
+                }
+            }
+        }, 1000); //in ms
+        
+
+        //Code for calling code to update all data on the page
+        
+        function updateLogs(msg) {
+            var data = $.parseJSON(msg);
+            
+            if ($('.log').length > MAX_NUM_LOGS) {
+                $('.log:last').remove();
+            }
+            
+            $("#logPlaceHolder").after('<div class="row log pad-left"><div>' + "[" + data['timeStamp'] + "] [" + data['logType'] + "]: " + data['sensor'] + " - " + data['exType'] + " - " + data['args'] + "</div></div>");
+            
+        }
+        
+        function updateAirQualityBar(barTextField, bar, barContainer, numParticles, scalar) {
+            
+            var percent = numParticles * scalar; //percent of bar to remove based on num particles
+
+            if (percent >= 100) {
+                bar.width('100%');
+            } else {
+                bar.width(percent + '%');
+            }
+            
+            if (percent <= 50) { // 50% of ceiling is the max recommended exposure amount
+                barTextField.css('color', GOOD_AIR_COLOR);
+                barContainer.css('border-color', GOOD_AIR_COLOR);
+                bar.css('background-color', GOOD_AIR_COLOR);
+            } else if (percent > 50 && percent <= 70) {
+                barTextField.css('color', FAIR_AIR_COLOR);
+                barContainer.css({"border-color": FAIR_AIR_COLOR});
+                bar.css('background-color', FAIR_AIR_COLOR);
+            } else {
+                barTextField.css('color', POOR_AIR_COLOR);
+                barContainer.css({"border-color": POOR_AIR_COLOR});
+                bar.css('background-color', POOR_AIR_COLOR);
+            }
+        }
+        
+        function updateAirQualityStats(msg) {
+            var data = $.parseJSON(msg);
+            
+            var pm10 = data["pm10"];
+            var pm25 = data["pm25"];
+            var pm100 = data["pm100"];
+            
+            $("#pm10Field").text(pm10);
+            $("#pm25Field").text(pm25);
+            $("#pm100Field").text(pm100);
+            $("#pm3umField").text(data["pm3um"]);
+            $("#pm5umField").text(data["pm5um"]);
+            $("#pm10umField").text(data["pm10um"]);
+            $("#pm25umField").text(data["pm25um"]);
+            $("#pm50umField").text(data["pm50um"]);
+            $("#pm100umField").text(data["pm100um"]);
+            
+            
+            updateAirQualityBar($("#pm10Field"), $("#pm10Bar"), $("#pm10BarContainer"), pm10, PM10_BAR_SCALAR);
+            updateAirQualityBar($("#pm25Field"), $("#pm25Bar"), $("#pm25BarContainer"), pm25, PM25_BAR_SCALAR);
+            updateAirQualityBar($("#pm100Field"), $("#pm100Bar"), $("#pm100BarContainer"), pm100, PM100_BAR_SCALAR);
+        }
+        
+        function updateGpsStats(msg) {
+            var data = $.parseJSON(msg);
+            var date = new Date(data["time"]);
+            
+            $("#fixField").text("[" + data["fixType"] + "]");
+            $("#timeField").text(date.toUTCString());
+            //$("#timeErrField").text(data["timeErr"]);
+            $("#latitudeField").text(data["latitude"]);
+            $("#latitudeErrField").text(data["latitudeErr"]);
+            $("#longitudeField").text(data["longitude"]);
+            $("#longitudeErrField").text(data["longitudeErr"]);
+            $("#altitudeField").text(data["altitude"]);
+            $("#altitudeErrField").text(data["altitudeErr"]);
+            $("#speedField").text(data["speed"]);
+            $("#speedErrField").text(data["speedErr"]);
+            $("#climbField").text(data["climb"]);
+            $("#climbErrField").text(data["climbErr"]);
+            //$("#headingField").text(data["heading"]);
+        }
+        
+        
+        function updateSysInfoData(msg) {
+            var data = $.parseJSON(msg);
+            $("#cpuTempField").text(data["cpuTemp"]);
+            $("#gpuTempField").text(data["gpuTemp"].toFixed(1));
+            $("#diskUsageField").text(data["diskUsagePercent"]);
+            $("#cpuUsageField").text(data["cpuUsagePercent"]);
+        }
+        
+        function updateBnoData(msg) {
+            var bnoData = $.parseJSON(msg);
+            var pitch = (bnoData.pitch - 90).toFixed(1); // subtract 90 since sensor is mounted on its side (bottom of sensor facing ahead, top facing towards you, "BNO055" PCB label on left side
+            var roll = bnoData.roll.toFixed(1);
+            var forwardAccel = parseFloat(bnoData.linAccelZ).toFixed(2);
+            var gForce = parseFloat(bnoData.gForce).toFixed(2);
+            
+            //getting the canvas elements seem to be only supported using plain JS, not jquery
+            updateView(document.getElementById("pitchView"), -1 * pitch, true); //multiply angle by -1 to adjust for the way the sensor is oriented
+            updateView(document.getElementById("rollView"), roll, true);
+                   
+            $('#heading').text(bnoData.heading);
+            $('#roll').text(roll);
+            $('#pitch').text(pitch);
+            $('#accelField').text(forwardAccel);
+            $('#gForceField').text(gForce);
+        }
+        
+        //initialize the canvases by drawing horizontal reference lines through the center
+        function initCanvases(canvas) {
+                var ctx = canvas.getContext("2d");
+                ctx.clearRect(0, 0, 200, 200);
+                
+                ctx.beginPath();
+                
+                ctx.setLineDash([10, 10]); //set to dashed line
+                ctx.strokeStyle = DEFAULT_COLOR;
+                ctx.lineWidth = 2;
+                
+                ctx.moveTo(0, 100);
+                ctx.lineTo(200, 100);
+                ctx.stroke();
+                
+                //create the 'tick' marks on the ends of the line we just drew
+                ctx.moveTo(0, 95);
+                ctx.lineTo(0, 105);
+                ctx.stroke();
+                ctx.moveTo(200, 95);
+                ctx.lineTo(200, 105);
+                ctx.stroke();
+                
+        }
+        
+        function updateView(canvas, angle, mirrorAngle, warningAngle) {
+            var ctx = canvas.getContext("2d");
+            var length =  100;
+              
+            initCanvases(canvas);
+            
+            //starting coordinate is center of canvas
+            var x1 = 100;
+            var y1 = 100;
+            
+            //initial line from origin
+            x2 = x1 + Math.cos(Math.PI * angle / 180) * length;
+            y2 = y1 + Math.sin(Math.PI * angle / 180) * length;
+            
+            ctx.beginPath();
+            ctx.setLineDash([]); // set to solid line
+            if (Math.abs(angle) > warningAngle) {
+                ctx.strokeStyle = FAIR_AIR_COLOR;
+            } else {
+                ctx.strokeStyle = DEFAULT_COLOR;
+            }
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+            
+            //'mirror' the line. Helpful for visualizing roll of car (side to side)
+            if (mirrorAngle) {
+                var x3 = x1 + Math.cos(Math.PI * (angle - 180) / 180) * length;
+                var y3 = y1 + Math.sin(Math.PI * (angle - 180) / 180) * length;
+                
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x3, y3);
+                ctx.stroke();
+            }
+        }
+    
+    });
+</script>

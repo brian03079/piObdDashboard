@@ -1,0 +1,129 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: black !important;
+  color: #00ba00 !important;
+  padding-bottom: .2em;
+  padding-top: .5em;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 1.2em;
+}
+
+canvas{
+  background-color: black;
+  background-position: center;
+  background-size: 100% 100%;
+}
+
+.bttn {
+  background-color: black;
+  border-color: #00ba00;
+  border-width: 1em;
+  color: #00ba00;
+}
+
+.log {
+  font-size: .7em;
+}
+
+.subheading {
+  font-size: 80%;
+}
+
+.table th, .table td, .table row{ 
+     border-top: none !important; 
+ }
+ 
+.padding-0{
+    padding-right:0;
+    padding-left:0;
+}
+ 
+.paddingTop {
+  padding-top: .2rem;
+}
+ 
+.topBorder {
+  border-top: 2px solid #00ba00;
+}
+
+.logContainer {
+  height: 7em;
+  overflow: hidden;
+}
+
+.borderGreen {
+  border-right: 2px solid #00ba00;
+  height: 60px;
+}
+
+.airQualityBar {
+  height: 200px;
+}
+
+.airQualityBox {
+  height: 100%;
+}
+
+.top-buffer { 
+  margin-top: .5rem;
+}
+
+.bar {
+  background-color: #00ba00;
+  float: left;
+  width: 50%;
+  height: 100%;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.border-color {
+  border-color: #00ba00 !important;
+}
+
+.pad-left {
+	margin-left: 15px;
+}
+
+.divider {
+  width: 50%;
+  height: 50%;
+  float: left;
+}
+
+.divider-small {
+  width: 33%;
+  height: 50%;
+  float: left;
+}
+
+.divider-wide {
+  width: 67%;
+  height: 50%;
+  float: left;
+}
+
+.hidden {
+  display: none;
+}
+
+#div1 {
+  background: #DDD;
+}
+
+#div2 {
+  background: #AAA;
+}
+
+#div3 {
+  background: #777;
+}
+
+#div4 {
+  background: #444;
+}
