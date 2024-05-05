@@ -12,8 +12,8 @@ obd2CmdListFile.close()
 
 
 sio = socketio.Client()
+print(sio)
 
-sio.connect('http://localhost:3000')
 
 def generateFaultCodes():
     return [
@@ -24,7 +24,7 @@ def generateFaultCodes():
     
 def generateData():
     idleTime = round(random.uniform(10.5, 75.5), 1)
-    print(idleTime)
+    #print(idleTime)
 
     data = {'speed': random.randint(75, 85),
         'rpm': random.randint(700, 7500),
@@ -37,7 +37,7 @@ def generateData():
 def sendData():
     sio.emit('data', generateData())
     sio.emit('dtcData', generateFaultCodes())
-    time.sleep(1)
+    time.sleep(.1)
 
 @sio.on('sensorDumpRequest')
 def on_message(data):
@@ -54,10 +54,10 @@ def on_message(data):
 @sio.event
 def connect():
     print("Connected!")
-
-    while (True):
-        generateFaultCodes()
-        sendData()
+#    while True:
+#        generateFaultCodes()
+#        sendData()
+#        print("asdf")
 
 @sio.event
 def connect_error():
@@ -70,3 +70,11 @@ def disconnect():
 @sio.event
 def message(data):
     print('I received a message!')
+
+
+
+sio.connect('http://localhost:3000')
+
+while True:
+    generateFaultCodes()
+    sendData()

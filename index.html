@@ -116,7 +116,7 @@
                     $("#cabinTempHeader").text("Cabin Temp " + degreeSymbol + degreeMetric);
 
                        var startTime = new Date($.now());
-                    var x_max = 500; //max number of data points per plot
+                    var x_max = 1000; //max number of data points per plot
 
                        var fontSize = 20;
                     var defaultColor = '#00ba00';
@@ -132,6 +132,9 @@
                        var lineWidth = 1;
 
                        var config = { responsive: true }
+                       
+                       var graphInterval = 4;
+                       var curInterval = 0;
 
                     var speedLayout = {
                     	autosize: true,
@@ -173,27 +176,37 @@
                     }], speedLayout, config);
 
                     function updateSpeedChart(speed, time) {
-                    	var speedingSpeed = 85000;
+                    	var speedingSpeed = 85;
                     	var warningSpeed = 80;
                     	var parsedSpeed = parseInt(speed);
-
-                    	$("#speedField").text(speed);
-
-                    	var speedTrace = {
-                    		x: [
-                    			[time]
-                    		],
-                    		y: [
-                    			[speed]
-                    		]
-                    	}
-                    	Plotly.extendTraces('speedChart', speedTrace, [0], x_max);
+                        
+                        curInterval += 1;
+                        
+                        $("#speedField").text(speed);
+                        
+                        //update the graphs for every 4 data points. 
+                        if (curInterval == graphInterval) {
+                            var speedTrace = {
+                                x: [
+                                    [time]
+                                ],
+                                y: [
+                                    [speed]
+                                ]
+                            }
+                            Plotly.extendTraces('speedChart', speedTrace, [0], x_max);
+                            
+                            curInterval = 0;
+                        }
                     }
                 </script>
             </div>
             <div class="wrapper">
                 <div id="rpmChart"></div>
                 <script>
+                    var rpmGraphInterval = 4;
+                    var rpmCurInterval = 0;
+                       
                     var rpmLayout = {
                     	autosize: true,
                     	height: plotHeight,
@@ -244,17 +257,22 @@
                     	} else {
                     		$("#rpmField").css('color', defaultColor);
                     	}
-
-                    	var scaledRpm = (rpm / 1000).toFixed(3);
-                    	var rpmTrace = {
-                    		x: [
-                    			[time]
-                    		],
-                    		y: [
-                    			[scaledRpm]
-                    		]
-                    	}
-                    	Plotly.extendTraces('rpmChart', rpmTrace, [0], x_max);
+                        
+                        rpmCurInterval += 1;
+                        
+                        if (rpmCurInterval == rpmGraphInterval) {
+                            var scaledRpm = (rpm / 1000).toFixed(3);
+                            var rpmTrace = {
+                                x: [
+                                    [time]
+                                ],
+                                y: [
+                                    [scaledRpm]
+                                ]
+                            }
+                            Plotly.extendTraces('rpmChart', rpmTrace, [0], x_max);
+                            rpmCurInterval = 0;
+                        }
                     }
                 </script>
             </div>

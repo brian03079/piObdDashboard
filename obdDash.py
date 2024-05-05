@@ -101,5 +101,5 @@ while True: #loop until a connection is made with the server instead of immediat
 @sio.event
 def connect():
     print("Connected to node server!")
-    emitTelemetry()
+    #emitTelemetry()
 
